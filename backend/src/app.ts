@@ -8,12 +8,27 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
+
+const mobileOrigins = ['capacitor://localhost', 'https://localhost', 'http://localhost'];
+const corsOrigins = [...new Set([...allowedOrigins, ...mobileOrigins])];
 
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: frontendUrl === '*' ? true : frontendUrl
+  origin: allowedOrigins.includes('*')
+    ? true
+    : (origin, callback) => {
+        if (!origin || corsOrigins.includes(origin)) {
+          callback(null, true);
+          return;
+        }
+
+        callback(new Error('Not allowed by CORS'));
+      }
 }));
 app.use(morgan('dev'));
 app.use(express.json());

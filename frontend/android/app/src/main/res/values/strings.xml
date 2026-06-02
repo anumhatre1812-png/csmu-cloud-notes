@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">CSMU Cloud Notes</string>
+    <string name="title_activity_main">CSMU Cloud Notes</string>
+    <string name="package_name">com.csmu.cloudnotes</string>
+    <string name="custom_url_scheme">com.csmu.cloudnotes</string>
+</resources>
