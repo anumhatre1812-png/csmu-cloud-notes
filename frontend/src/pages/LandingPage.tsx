@@ -15,10 +15,15 @@ const LandingPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-5xl md:text-7xl font-bold font-poppins text-textPrimary">
+            <img
+              src="/android-chrome-192x192.png"
+              alt=""
+              className="mx-auto mb-6 h-20 w-20 rounded-2xl shadow-lg sm:h-24 sm:w-24"
+            />
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold font-poppins text-textPrimary">
               CSMU <span className="text-primary">Cloud Notes</span>
             </h1>
-            <p className="mt-6 text-xl text-textSecondary max-w-2xl font-inter">
+            <p className="mt-6 text-base sm:text-xl text-textSecondary max-w-2xl font-inter">
               Secure, centralized, and instant access to all your academic resources. 
               Designed specifically for Chhatrapati Shivaji Maharaj University students.
             </p>
@@ -31,7 +36,7 @@ const LandingPage: React.FC = () => {
           >
             <button
               onClick={() => navigate('/login')}
-              className="btn-primary text-lg px-10 py-4"
+              className="btn-primary text-base sm:text-lg px-8 sm:px-10 py-4"
             >
               Login to Access Notes
             </button>

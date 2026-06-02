@@ -1,0 +1,19 @@
+{
+  "name": "CSMU Cloud Notes",
+  "short_name": "CSMU Notes",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#FF9A86",
+  "background_color": "#FFF8F5",
+  "display": "standalone"
+}

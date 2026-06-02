@@ -22,11 +22,18 @@ const Navbar: React.FC = () => {
   return (
     <nav className="sticky top-0 z-50 bg-white/70 backdrop-blur-lg border-b border-primary/10 px-6 py-4">
       <div className="container mx-auto flex items-center justify-between">
-        <Link to="/" className="text-2xl font-bold font-poppins text-primary">
-          CSMU <span className="text-textPrimary">Notes</span>
+        <Link to="/" className="flex min-w-0 items-center gap-3 text-xl sm:text-2xl font-bold font-poppins text-primary">
+          <img
+            src="/favicon-32x32.png"
+            alt=""
+            className="h-8 w-8 shrink-0 rounded-lg"
+          />
+          <span className="truncate">
+            CSMU <span className="text-textPrimary">Notes</span>
+          </span>
         </Link>
 
-        <div className="flex items-center gap-6">
+        <div className="flex min-w-0 items-center gap-3 sm:gap-6">
           {isAdmin && (
             <div className="hidden md:flex items-center gap-4">
               <Link to="/admin/dashboard" className="text-textSecondary hover:text-primary transition-colors flex items-center gap-2">
@@ -44,7 +51,7 @@ const Navbar: React.FC = () => {
             </div>
           )}
           
-          <div className="flex items-center gap-3 pl-6 border-l border-gray-200">
+          <div className="flex items-center gap-3 pl-3 sm:pl-6 border-l border-gray-200">
             <div className="hidden sm:block text-right">
               <p className="text-sm font-semibold font-poppins text-textPrimary">{user?.displayName}</p>
               <p className="text-xs text-textSecondary font-inter">{isAdmin ? 'Admin' : 'Student'}</p>
