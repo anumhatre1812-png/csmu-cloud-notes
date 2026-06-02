@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { auth } from '../config/firebase';
 import { useAuth } from '../contexts/AuthContext';
-import { toast } from 'react-hot-toast';
+import { loginWithGoogle } from '../services/authService';
 
 const LoginPage: React.FC = () => {
   const { user, isAdmin } = useAuth();
@@ -21,14 +19,7 @@ const LoginPage: React.FC = () => {
   }, [user, isAdmin, navigate]);
 
   const handleGoogleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-      toast.success('Login successful!');
-    } catch (error) {
-      console.error('Login error:', error);
-      toast.error('Failed to login. Please try again.');
-    }
+    await loginWithGoogle();
   };
 
   return (
