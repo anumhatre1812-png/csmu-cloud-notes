@@ -1,0 +1,71 @@
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import LandingPage from '../pages/LandingPage';
+import LoginPage from '../pages/LoginPage';
+import UnauthorizedPage from '../pages/UnauthorizedPage';
+import StudentDashboard from '../pages/student/StudentDashboard';
+import AdminDashboard from '../pages/admin/AdminDashboard';
+import AdminUpload from '../pages/admin/AdminUpload';
+import AdminManage from '../pages/admin/AdminManage';
+import ProtectedRoute from '../components/auth/ProtectedRoute';
+import AdminRoute from '../components/auth/AdminRoute';
+
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <LandingPage />,
+  },
+  {
+    path: '/login',
+    element: <LoginPage />,
+  },
+  {
+    path: '/unauthorized',
+    element: <UnauthorizedPage />,
+  },
+  {
+    path: '/student',
+    children: [
+      {
+        path: 'dashboard',
+        element: (
+          <ProtectedRoute>
+            <StudentDashboard />
+          </ProtectedRoute>
+        ),
+      },
+    ],
+  },
+  {
+    path: '/admin',
+    children: [
+      {
+        path: 'dashboard',
+        element: (
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: 'upload',
+        element: (
+          <AdminRoute>
+            <AdminUpload />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: 'manage',
+        element: (
+          <AdminRoute>
+            <AdminManage />
+          </AdminRoute>
+        ),
+      },
+    ],
+  },
+  {
+    path: '*',
+    element: <Navigate to="/" replace />,
+  },
+]);
