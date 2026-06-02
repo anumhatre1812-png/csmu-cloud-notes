@@ -7,6 +7,11 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: 'https',
     allowNavigation: ['accounts.google.com', '*.firebaseapp.com', '*.google.com']
+  },
+  plugins: {
+    FirebaseAuthentication: {
+      providers: ['google.com']
+    }
   }
 };
 
