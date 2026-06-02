@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, type User } from 'firebase/auth';
+import { onIdTokenChanged, type User } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { isAdmin as checkAdmin } from '../config/admins';
 
@@ -17,9 +17,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setIsAdmin(checkAdmin(user?.email));
+    const unsubscribe = onIdTokenChanged(auth, async (user) => {
+      if (user && !user.email) {
+        try {
+          await user.reload();
+        } catch {}
+      }
+      const currentUser = auth.currentUser;
+      setUser(currentUser);
+      setIsAdmin(checkAdmin(currentUser?.email));
       setLoading(false);
     });
 

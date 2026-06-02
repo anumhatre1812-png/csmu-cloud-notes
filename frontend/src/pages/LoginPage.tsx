@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
@@ -7,6 +7,7 @@ import { loginWithGoogle } from '../services/authService';
 const LoginPage: React.FC = () => {
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -19,7 +20,12 @@ const LoginPage: React.FC = () => {
   }, [user, isAdmin, navigate]);
 
   const handleGoogleLogin = async () => {
-    await loginWithGoogle();
+    try {
+      setError(null);
+      await loginWithGoogle();
+    } catch (e: any) {
+      setError(e?.message || String(e));
+    }
   };
 
   return (
@@ -33,6 +39,12 @@ const LoginPage: React.FC = () => {
           <h2 className="text-3xl font-bold font-poppins text-textPrimary">Welcome Back</h2>
           <p className="mt-2 text-textSecondary font-inter">Sign in to access your dashboard</p>
         </div>
+
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-sm text-red-400 font-inter">
+            {error}
+          </div>
+        )}
 
         <button
           onClick={handleGoogleLogin}
