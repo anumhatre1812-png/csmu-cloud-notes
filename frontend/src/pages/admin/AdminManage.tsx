@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../../components/layout/Navbar';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trash2, ExternalLink, Search, FileText } from 'lucide-react';
+import { Edit3, ExternalLink, FileText, Save, Search, Trash2, X } from 'lucide-react';
 import { fetchFiles } from '../../services/fileService';
-import { deleteFileApi } from '../../services/apiService';
+import { deleteFileApi, updateFileMetadataApi } from '../../services/apiService';
 import { toast } from 'react-hot-toast';
 
 const AdminManage: React.FC = () => {
   const [files, setFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [editingFile, setEditingFile] = useState<any | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editSubject, setEditSubject] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     loadFiles();
@@ -39,6 +43,49 @@ const AdminManage: React.FC = () => {
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Delete failed');
       setFiles(previousFiles);
+    }
+  };
+
+  const openEditModal = (file: any) => {
+    setEditingFile(file);
+    setEditTitle(file.title);
+    setEditSubject(file.subject || '');
+  };
+
+  const closeEditModal = () => {
+    if (isSaving) return;
+    setEditingFile(null);
+    setEditTitle('');
+    setEditSubject('');
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!editingFile) return;
+
+    const title = editTitle.trim();
+    const subject = editSubject.trim();
+
+    if (!title) {
+      toast.error('File title is required');
+      return;
+    }
+
+    setIsSaving(true);
+    const toastId = toast.loading('Saving changes...');
+
+    try {
+      const updatedFile = await updateFileMetadataApi(editingFile.id, { title, subject });
+      setFiles(files.map(file => file.id === updatedFile.id ? updatedFile : file));
+      toast.success('File updated', { id: toastId });
+      setEditingFile(null);
+      setEditTitle('');
+      setEditSubject('');
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Update failed', { id: toastId });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -126,6 +173,13 @@ const AdminManage: React.FC = () => {
                             <ExternalLink size={18} />
                           </a>
                           <button
+                            onClick={() => openEditModal(file)}
+                            className="p-2 text-textSecondary hover:text-primary transition-colors"
+                            title="Edit File"
+                          >
+                            <Edit3 size={18} />
+                          </button>
+                          <button
                             onClick={() => handleDelete(file.id, file.title)}
                             className="p-2 text-textSecondary hover:text-red-500 transition-colors"
                             title="Delete File"
@@ -154,6 +208,88 @@ const AdminManage: React.FC = () => {
           )}
         </div>
       </main>
+
+      <AnimatePresence>
+        {editingFile && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-textPrimary/30 px-4 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.form
+              onSubmit={handleSaveEdit}
+              className="glass-card w-full max-w-lg p-6 space-y-5"
+              initial={{ opacity: 0, y: 24, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 24, scale: 0.98 }}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-bold font-poppins text-textPrimary">Edit File</h2>
+                  <p className="text-sm text-textSecondary font-inter">
+                    Update the visible title and subject.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeEditModal}
+                  className="p-2 text-textSecondary hover:text-red-500 transition-colors"
+                  title="Close"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-semibold font-poppins text-textSecondary px-1">
+                  File Title *
+                </label>
+                <input
+                  type="text"
+                  required
+                  maxLength={160}
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="w-full px-4 py-3 bg-white/70 border border-primary/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-inter"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-semibold font-poppins text-textSecondary px-1">
+                  Subject
+                </label>
+                <input
+                  type="text"
+                  maxLength={120}
+                  value={editSubject}
+                  onChange={(e) => setEditSubject(e.target.value)}
+                  className="w-full px-4 py-3 bg-white/70 border border-primary/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-inter"
+                />
+              </div>
+
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={closeEditModal}
+                  className="btn-secondary flex items-center justify-center gap-2"
+                >
+                  <X size={18} />
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="btn-primary flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  <Save size={18} />
+                  {isSaving ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+            </motion.form>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

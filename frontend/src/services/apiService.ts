@@ -27,6 +27,15 @@ export const deleteFileApi = async (id: string) => {
   return data;
 };
 
+export const updateFileMetadataApi = async (
+  id: string,
+  payload: { title: string; subject: string }
+) => {
+  const headers = await getAuthHeaders();
+  const { data } = await axios.patch(`${API_URL}/api/files/${id}`, payload, { headers });
+  return data.file;
+};
+
 export const fetchFilesApi = async () => {
   const headers = await getAuthHeaders();
   const { data } = await axios.get(`${API_URL}/api/files`, { headers });
