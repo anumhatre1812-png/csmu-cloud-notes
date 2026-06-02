@@ -10,12 +10,19 @@ const getAuthHeaders = async () => {
   };
 };
 
-export const uploadFileApi = async (formData: FormData) => {
+export const uploadFileApi = async (
+  formData: FormData,
+  onProgress?: (progress: number) => void
+) => {
   const headers = await getAuthHeaders();
   const { data } = await axios.post(`${API_URL}/api/files/upload`, formData, {
     headers: {
       ...headers,
       'Content-Type': 'multipart/form-data'
+    },
+    onUploadProgress: (event) => {
+      if (!event.total || !onProgress) return;
+      onProgress(Math.round((event.loaded * 100) / event.total));
     }
   });
   return data;

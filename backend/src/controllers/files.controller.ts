@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/verifyFirebaseToken.js';
 import { supabase } from '../config/supabase.js';
+import { logAdminAction } from '../services/auditLog.service.js';
 
 export const listFiles = async (_req: AuthRequest, res: Response) => {
   try {
@@ -80,6 +81,16 @@ export const updateFileMetadata = async (req: AuthRequest, res: Response) => {
       .single();
 
     if (error) throw error;
+
+    await logAdminAction({
+      adminEmail: req.user.email,
+      action: 'edit',
+      fileId: data.id,
+      fileTitle: data.title,
+      metadata: {
+        subject: data.subject
+      }
+    });
 
     return res.status(200).json({
       success: true,

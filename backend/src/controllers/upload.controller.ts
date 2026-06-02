@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/verifyFirebaseToken.js';
 import { supabase } from '../config/supabase.js';
+import { logAdminAction } from '../services/auditLog.service.js';
 import { v4 as uuidv4 } from 'uuid';
 
 const VALID_CATEGORIES = new Set([
@@ -107,6 +108,18 @@ export const uploadFile = async (req: AuthRequest, res: Response) => {
       await supabase.storage.from(category).remove([filePath]);
       throw dbError;
     }
+
+    await logAdminAction({
+      adminEmail: req.user.email,
+      action: 'upload',
+      fileId: dbData.id,
+      fileTitle: dbData.title,
+      metadata: {
+        category,
+        file_size: file.size,
+        file_type: file.mimetype
+      }
+    });
 
     return res.status(200).json({
       success: true,

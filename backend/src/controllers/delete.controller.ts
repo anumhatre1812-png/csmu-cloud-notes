@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/verifyFirebaseToken.js';
 import { supabase } from '../config/supabase.js';
+import { logAdminAction } from '../services/auditLog.service.js';
 
 export const deleteFile = async (req: AuthRequest, res: Response) => {
   try {
@@ -9,7 +10,7 @@ export const deleteFile = async (req: AuthRequest, res: Response) => {
     // 1. Get file metadata to find storage path and category
     const { data: fileData, error: fetchError } = await supabase
       .from('files')
-      .select('storage_path, category')
+      .select('id, title, storage_path, category, file_size, file_type')
       .eq('id', id)
       .single();
 
@@ -35,6 +36,18 @@ export const deleteFile = async (req: AuthRequest, res: Response) => {
     if (dbError) {
       throw dbError;
     }
+
+    await logAdminAction({
+      adminEmail: req.user.email,
+      action: 'delete',
+      fileId: fileData.id,
+      fileTitle: fileData.title,
+      metadata: {
+        category: fileData.category,
+        file_size: fileData.file_size,
+        file_type: fileData.file_type
+      }
+    });
 
     return res.status(200).json({
       success: true,

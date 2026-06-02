@@ -12,6 +12,7 @@ const AdminUpload: React.FC = () => {
   const [category, setCategory] = useState('notes');
   const [subject, setSubject] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const navigate = useNavigate();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,16 +40,18 @@ const AdminUpload: React.FC = () => {
     formData.append('subject', subject);
 
     setIsUploading(true);
+    setUploadProgress(0);
     const toastId = toast.loading('Uploading file...');
 
     try {
-      await uploadFileApi(formData);
+      await uploadFileApi(formData, setUploadProgress);
       toast.success('File uploaded successfully', { id: toastId });
       navigate('/admin/manage');
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Upload failed', { id: toastId });
     } finally {
       setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -172,6 +175,23 @@ const AdminUpload: React.FC = () => {
           >
             {isUploading ? 'Uploading Please Wait...' : 'Confirm and Upload'}
           </button>
+
+          {isUploading && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs font-semibold font-inter text-textSecondary">
+                <span>Upload progress</span>
+                <span>{uploadProgress}%</span>
+              </div>
+              <div className="h-3 overflow-hidden rounded-full bg-primary/10">
+                <motion.div
+                  className="h-full rounded-full bg-gradient-to-r from-primary to-secondary"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${uploadProgress}%` }}
+                  transition={{ duration: 0.2 }}
+                />
+              </div>
+            </div>
+          )}
         </motion.form>
       </main>
     </div>

@@ -29,12 +29,21 @@ export const getStats = async (req: AuthRequest, res: Response) => {
       }
     });
 
+    const { data: recentUploads, error: recentUploadsError } = await supabase
+      .from('files')
+      .select('id, title, category, subject, uploader_name, file_size, created_at')
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    if (recentUploadsError) throw recentUploadsError;
+
     return res.status(200).json({
       success: true,
       stats: {
         totalFiles,
         totalSize,
-        categoryStats
+        categoryStats,
+        recentUploads
       }
     });
 

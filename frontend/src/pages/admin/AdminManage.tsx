@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../../components/layout/Navbar';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Edit3, ExternalLink, FileText, Save, Search, Trash2, X } from 'lucide-react';
+import { AlertTriangle, Edit3, ExternalLink, FileText, Save, Search, Trash2, X } from 'lucide-react';
 import { fetchFiles } from '../../services/fileService';
 import { deleteFileApi, updateFileMetadataApi } from '../../services/apiService';
 import { toast } from 'react-hot-toast';
@@ -14,6 +14,8 @@ const AdminManage: React.FC = () => {
   const [editTitle, setEditTitle] = useState('');
   const [editSubject, setEditSubject] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [deletingFile, setDeletingFile] = useState<any | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     loadFiles();
@@ -30,19 +32,33 @@ const AdminManage: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: string, title: string) => {
-    if (!window.confirm(`Are you sure you want to delete "${title}"?`)) return;
+  const openDeleteModal = (file: any) => {
+    setDeletingFile(file);
+  };
 
+  const closeDeleteModal = () => {
+    if (isDeleting) return;
+    setDeletingFile(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingFile) return;
+
+    const { id } = deletingFile;
     // Optimistic UI update
     const previousFiles = [...files];
     setFiles(files.filter(f => f.id !== id));
+    setIsDeleting(true);
 
     try {
       await deleteFileApi(id);
       toast.success('File deleted successfully');
+      setDeletingFile(null);
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Delete failed');
       setFiles(previousFiles);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -180,7 +196,7 @@ const AdminManage: React.FC = () => {
                             <Edit3 size={18} />
                           </button>
                           <button
-                            onClick={() => handleDelete(file.id, file.title)}
+                            onClick={() => openDeleteModal(file)}
                             className="p-2 text-textSecondary hover:text-red-500 transition-colors"
                             title="Delete File"
                           >
@@ -210,6 +226,71 @@ const AdminManage: React.FC = () => {
       </main>
 
       <AnimatePresence>
+        {deletingFile && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-textPrimary/30 px-4 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="glass-card w-full max-w-lg p-6 space-y-5"
+              initial={{ opacity: 0, y: 24, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 24, scale: 0.98 }}
+            >
+              <div className="flex items-start gap-4">
+                <div className="shrink-0 rounded-2xl bg-red-50 p-3 text-red-500">
+                  <AlertTriangle size={28} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-xl font-bold font-poppins text-textPrimary">Delete File</h2>
+                  <p className="mt-1 text-sm text-textSecondary font-inter">
+                    This will remove the file from storage and the database.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeDeleteModal}
+                  className="p-2 text-textSecondary hover:text-red-500 transition-colors"
+                  title="Close"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="rounded-2xl border border-primary/10 bg-white/60 p-4">
+                <p className="truncate font-poppins font-semibold text-textPrimary">
+                  {deletingFile.title}
+                </p>
+                <p className="mt-1 text-sm text-textSecondary font-inter">
+                  {deletingFile.category?.replace('-', ' ')} • {deletingFile.subject || 'General'}
+                </p>
+              </div>
+
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={closeDeleteModal}
+                  className="btn-secondary flex items-center justify-center gap-2"
+                >
+                  <X size={18} />
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmDelete}
+                  disabled={isDeleting}
+                  className="flex items-center justify-center gap-2 rounded-xl bg-red-500 px-6 py-2 font-semibold text-white transition-all duration-200 hover:bg-red-600 disabled:opacity-50"
+                >
+                  <Trash2 size={18} />
+                  {isDeleting ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
         {editingFile && (
           <motion.div
             className="fixed inset-0 z-[60] flex items-center justify-center bg-textPrimary/30 px-4 backdrop-blur-sm"

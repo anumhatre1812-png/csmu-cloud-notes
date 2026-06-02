@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../../components/layout/Navbar';
 import { motion } from 'framer-motion';
-import { Database, Files, HardDrive, BarChart3, TrendingUp } from 'lucide-react';
+import { Clock, Database, FileText, Files, HardDrive, BarChart3, TrendingUp } from 'lucide-react';
 import { fetchAdminStats } from '../../services/apiService';
 import { toast } from 'react-hot-toast';
 
@@ -27,6 +27,14 @@ const AdminDashboard: React.FC = () => {
   const formatSize = (bytes: number) => {
     if (!bytes) return '0 MB';
     return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+  };
+
+  const formatDate = (value: string) => {
+    return new Date(value).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
   };
 
   return (
@@ -102,7 +110,7 @@ const AdminDashboard: React.FC = () => {
         )}
 
         <h3 className="text-xl font-bold font-poppins text-textPrimary mb-6 px-1">Category Distribution</h3>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-12">
           {stats && Object.entries(stats.categoryStats).map(([cat, count], i) => (
             <motion.div
               key={cat}
@@ -115,6 +123,52 @@ const AdminDashboard: React.FC = () => {
               <p className="text-2xl font-bold font-poppins text-textPrimary">{count as number}</p>
             </motion.div>
           ))}
+        </div>
+
+        <div className="flex items-center gap-3 mb-6 px-1">
+          <Clock size={22} className="text-primary" />
+          <h3 className="text-xl font-bold font-poppins text-textPrimary">Recent Uploads</h3>
+        </div>
+
+        <div className="glass-card overflow-hidden">
+          {stats?.recentUploads?.length ? (
+            <div className="divide-y divide-primary/5">
+              {stats.recentUploads.map((file: any, index: number) => (
+                <motion.div
+                  key={file.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.04 }}
+                  className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="shrink-0 rounded-xl bg-primary/10 p-3 text-primary">
+                      <FileText size={20} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate font-poppins font-semibold text-textPrimary">
+                        {file.title}
+                      </p>
+                      <p className="text-sm text-textSecondary font-inter">
+                        {file.subject || 'General'} • {file.uploader_name}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between gap-4 text-sm text-textSecondary sm:justify-end">
+                    <span className="rounded-full bg-secondary/10 px-3 py-1 text-xs font-bold uppercase text-secondary">
+                      {file.category.replace('-', ' ')}
+                    </span>
+                    <span>{formatSize(file.file_size)}</span>
+                    <span>{formatDate(file.created_at)}</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="px-5 py-12 text-center text-textSecondary font-inter">
+              No recent uploads yet.
+            </div>
+          )}
         </div>
       </main>
     </div>
