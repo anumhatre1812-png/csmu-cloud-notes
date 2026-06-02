@@ -27,6 +27,18 @@ export const deleteFileApi = async (id: string) => {
   return data;
 };
 
+export const fetchFilesApi = async () => {
+  const headers = await getAuthHeaders();
+  const { data } = await axios.get(`${API_URL}/api/files`, { headers });
+  return data.files;
+};
+
+export const getDownloadUrlApi = async (id: string) => {
+  const headers = await getAuthHeaders();
+  const { data } = await axios.get(`${API_URL}/api/files/${id}/download-url`, { headers });
+  return data.signedUrl;
+};
+
 export const fetchAdminStats = async () => {
   const headers = await getAuthHeaders();
   const { data } = await axios.get(`${API_URL}/api/admin/stats`, { headers });

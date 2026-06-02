@@ -34,7 +34,9 @@ app.get('/health', (req, res) => {
 import uploadRoutes from './routes/upload.route.js';
 import deleteRoutes from './routes/delete.route.js';
 import statsRoutes from './routes/stats.route.js';
+import filesRoutes from './routes/files.route.js';
 
+app.use('/api/files', filesRoutes);
 app.use('/api/files', uploadRoutes);
 app.use('/api/files', deleteRoutes);
 app.use('/api/admin', statsRoutes);

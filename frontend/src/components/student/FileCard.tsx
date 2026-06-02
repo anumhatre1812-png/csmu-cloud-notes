@@ -14,7 +14,7 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
   const handleDownload = async () => {
     setIsDownloading(true);
     try {
-      const url = await getDownloadUrl(file.category, file.storage_path);
+      const url = await getDownloadUrl(file.id);
       const link = document.createElement('a');
       link.href = url;
       link.download = file.title;
