@@ -2,7 +2,6 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { isAdmin as checkAdmin } from '../config/admins';
-import { handleRedirectResult } from '../services/authService';
 
 interface AuthContextType {
   user: User | null;
@@ -18,13 +17,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    handleRedirectResult().then((result) => {
-      if (result?.user) {
-        setUser(result.user);
-        setIsAdmin(checkAdmin(result.user.email));
-        setLoading(false);
-      }
-    });
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setIsAdmin(checkAdmin(user?.email));

@@ -5,7 +5,8 @@ const config: CapacitorConfig = {
   appName: 'CSMU Cloud Notes',
   webDir: 'dist',
   server: {
-    androidScheme: 'https'
+    androidScheme: 'https',
+    allowNavigation: ['accounts.google.com', '*.firebaseapp.com', '*.google.com']
   }
 };
 
