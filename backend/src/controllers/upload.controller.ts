@@ -3,9 +3,39 @@ import { AuthRequest } from '../middleware/verifyFirebaseToken.js';
 import { supabase } from '../config/supabase.js';
 import { v4 as uuidv4 } from 'uuid';
 
+const VALID_CATEGORIES = new Set([
+  'notes',
+  'assignments',
+  'lab-manuals',
+  'question-papers',
+  'question-bank'
+]);
+
+const ALLOWED_MIME_TYPES = new Set([
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'image/jpeg',
+  'image/png',
+  'image/webp'
+]);
+
+const sanitizeFileName = (fileName: string) => {
+  return fileName
+    .replace(/[/\\?%*:|"<>]/g, '')
+    .replace(/\s+/g, '_')
+    .slice(0, 120);
+};
+
 export const uploadFile = async (req: AuthRequest, res: Response) => {
   try {
-    const { title, category, subject } = req.body;
+    const title = typeof req.body.title === 'string' ? req.body.title.trim() : '';
+    const category = typeof req.body.category === 'string' ? req.body.category.trim() : '';
+    const subject = typeof req.body.subject === 'string' ? req.body.subject.trim() : '';
     const file = req.file;
 
     if (!file) {
@@ -16,9 +46,27 @@ export const uploadFile = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Title and category are required' });
     }
 
-    const fileExt = file.originalname.split('.').pop();
-    const fileName = `${uuidv4()}-${file.originalname.replace(/\s+/g, '_')}`;
-    const filePath = `${category}/${new Date().getFullYear()}/${new Date().getMonth() + 1}/${fileName}`;
+    if (!VALID_CATEGORIES.has(category)) {
+      return res.status(400).json({ error: 'Invalid category' });
+    }
+
+    if (title.length > 160) {
+      return res.status(400).json({ error: 'Title must be 160 characters or less' });
+    }
+
+    if (subject.length > 120) {
+      return res.status(400).json({ error: 'Subject must be 120 characters or less' });
+    }
+
+    if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
+      return res.status(400).json({ error: 'Unsupported file type' });
+    }
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const fileName = `${uuidv4()}-${sanitizeFileName(file.originalname)}`;
+    const filePath = `${year}/${month}/${fileName}`;
 
     // 1. Upload to Supabase Storage
     const { data: storageData, error: storageError } = await supabase.storage
@@ -43,7 +91,7 @@ export const uploadFile = async (req: AuthRequest, res: Response) => {
       .insert({
         title,
         category,
-        subject,
+        subject: subject || null,
         file_url: publicUrl,
         storage_path: filePath,
         file_type: file.mimetype,
