@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { getStats } from '../controllers/stats.controller';
-import { verifyFirebaseToken } from '../middleware/verifyFirebaseToken';
-import { checkAdminRole } from '../middleware/checkAdminRole';
+import { getStats } from '../controllers/stats.controller.js';
+import { verifyFirebaseToken } from '../middleware/verifyFirebaseToken.js';
+import { checkAdminRole } from '../middleware/checkAdminRole.js';
 
 const router = Router();
 

@@ -1,4 +1,5 @@
 import admin from 'firebase-admin';
+import type { Auth } from 'firebase-admin/auth';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -15,5 +16,5 @@ if (!admin.apps.length) {
   });
 }
 
-export const adminAuth = admin.auth();
+export const adminAuth: Auth = admin.auth();
 export default admin;

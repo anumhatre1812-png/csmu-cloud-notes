@@ -8,12 +8,12 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
+  origin: frontendUrl === '*' ? true : frontendUrl
 }));
 app.use(morgan('dev'));
 app.use(express.json());
@@ -31,9 +31,9 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
-import uploadRoutes from './routes/upload.route';
-import deleteRoutes from './routes/delete.route';
-import statsRoutes from './routes/stats.route';
+import uploadRoutes from './routes/upload.route.js';
+import deleteRoutes from './routes/delete.route.js';
+import statsRoutes from './routes/stats.route.js';
 
 app.use('/api/files', uploadRoutes);
 app.use('/api/files', deleteRoutes);

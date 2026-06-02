@@ -1,6 +1,6 @@
 import { Response } from 'express';
-import { AuthRequest } from '../middleware/verifyFirebaseToken';
-import { supabase } from '../config/supabase';
+import { AuthRequest } from '../middleware/verifyFirebaseToken.js';
+import { supabase } from '../config/supabase.js';
 
 export const deleteFile = async (req: AuthRequest, res: Response) => {
   try {

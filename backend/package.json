@@ -1,6 +1,7 @@
 {
   "name": "csmu-cloud-notes-backend",
   "version": "1.0.0",
+  "type": "module",
   "description": "Backend for CSMU Cloud Notes",
   "main": "dist/server.js",
   "scripts": {

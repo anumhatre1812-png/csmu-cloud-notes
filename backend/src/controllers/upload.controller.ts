@@ -1,6 +1,6 @@
 import { Response } from 'express';
-import { AuthRequest } from '../middleware/verifyFirebaseToken';
-import { supabase } from '../config/supabase';
+import { AuthRequest } from '../middleware/verifyFirebaseToken.js';
+import { supabase } from '../config/supabase.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export const uploadFile = async (req: AuthRequest, res: Response) => {

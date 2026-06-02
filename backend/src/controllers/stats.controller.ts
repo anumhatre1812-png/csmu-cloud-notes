@@ -1,6 +1,6 @@
 import { Response } from 'express';
-import { AuthRequest } from '../middleware/verifyFirebaseToken';
-import { supabase } from '../config/supabase';
+import { AuthRequest } from '../middleware/verifyFirebaseToken.js';
+import { supabase } from '../config/supabase.js';
 
 export const getStats = async (req: AuthRequest, res: Response) => {
   try {
@@ -24,7 +24,7 @@ export const getStats = async (req: AuthRequest, res: Response) => {
     };
 
     files.forEach(f => {
-      if (categoryStats[f.category] !== undefined) {
+      if (f.category && categoryStats[f.category] !== undefined) {
         categoryStats[f.category]++;
       }
     });
