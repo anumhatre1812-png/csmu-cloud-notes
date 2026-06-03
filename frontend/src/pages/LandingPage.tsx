@@ -9,11 +9,12 @@ const LandingPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (loading) return;
     if (user) {
       navigate(isAdmin ? '/admin/dashboard' : '/student/dashboard', { replace: true });
     }
-  }, [user, loading, isAdmin, navigate]);
+  }, [user, isAdmin, navigate]);
+
+  if (loading) return null;
 
   return (
     <div className="min-h-screen flex flex-col">
