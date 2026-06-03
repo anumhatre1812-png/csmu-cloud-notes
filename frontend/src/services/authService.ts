@@ -3,7 +3,12 @@ import { auth } from '../config/firebase';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 
 export const loginWithGoogle = async () => {
-  const result = await FirebaseAuthentication.signInWithGoogle();
+  let result;
+  try {
+    result = await FirebaseAuthentication.signInWithGoogle();
+  } catch {
+    result = await FirebaseAuthentication.signInWithGoogle({ useCredentialManager: false });
+  }
   const idToken = result.credential?.idToken;
   if (idToken) {
     const credential = GoogleAuthProvider.credential(idToken);
