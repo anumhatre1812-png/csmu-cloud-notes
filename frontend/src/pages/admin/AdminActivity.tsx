@@ -62,14 +62,14 @@ const AdminActivity: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow container mx-auto px-6 py-10">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-primary/10 rounded-2xl">
-              <Clock size={28} className="text-primary" />
+      <main className="flex-grow container mx-auto px-4 sm:px-6 py-6 sm:py-10">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="p-2.5 sm:p-3 bg-primary/10 rounded-2xl shrink-0">
+              <Clock size={24} className="text-primary" />
             </div>
-            <div>
-              <h1 className="text-3xl font-bold font-poppins text-textPrimary">Activity Log</h1>
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-3xl font-bold font-poppins text-textPrimary">Activity Log</h1>
               <p className="text-textSecondary font-inter text-sm">Admin action audit trail</p>
             </div>
           </div>

@@ -95,18 +95,18 @@ const AdminAnnouncements: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow container mx-auto px-6 py-10">
-        <div className="flex items-center justify-between mb-10">
+      <main className="flex-grow container mx-auto px-4 sm:px-6 py-6 sm:py-10">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-primary/10 rounded-2xl">
+            <div className="p-3 bg-primary/10 rounded-2xl shrink-0">
               <Megaphone size={28} className="text-primary" />
             </div>
-            <div>
-              <h1 className="text-3xl font-bold font-poppins text-textPrimary">Announcements</h1>
+            <div className="min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold font-poppins text-textPrimary">Announcements</h1>
               <p className="text-textSecondary font-inter text-sm">Manage notices for students</p>
             </div>
           </div>
-          <button onClick={openCreate} className="btn-primary flex items-center gap-2 px-5 py-3 text-sm">
+          <button onClick={openCreate} className="btn-primary flex items-center justify-center gap-2 px-5 py-3 text-sm w-full sm:w-auto">
             <Plus size={18} />
             New Announcement
           </button>

@@ -59,7 +59,7 @@ const AdminUpload: React.FC = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-grow container mx-auto px-6 py-10 max-w-4xl">
+      <main className="flex-grow container mx-auto px-4 sm:px-6 py-6 sm:py-10 max-w-4xl">
         <div className="flex items-center gap-4 mb-8">
           <div className="p-3 bg-primary/10 rounded-2xl text-primary">
             <Upload size={32} />

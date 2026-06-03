@@ -41,7 +41,7 @@ const AdminDashboard: React.FC = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-grow container mx-auto px-6 py-10">
+      <main className="flex-grow container mx-auto px-4 sm:px-6 py-6 sm:py-10">
         <div className="flex items-center gap-4 mb-10">
           <div className="p-3 bg-primary/10 rounded-2xl text-primary">
             <BarChart3 size={32} />

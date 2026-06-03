@@ -23,7 +23,7 @@ const ProfilePage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow container mx-auto px-6 py-12 flex items-start justify-center">
+      <main className="flex-grow container mx-auto px-4 sm:px-6 py-8 sm:py-12 flex items-start justify-center">
         <div className="w-full max-w-md">
           <div className="glass-card p-8 flex flex-col items-center gap-6">
             <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
