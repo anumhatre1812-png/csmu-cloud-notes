@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { LogOut, LayoutDashboard, Upload, Settings, Menu, X, User, Clock, Megaphone } from 'lucide-react';
-import { auth } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
+import { logout } from '../../services/authService';
 import { toast } from 'react-hot-toast';
 
 const Navbar: React.FC = () => {
@@ -12,10 +12,10 @@ const Navbar: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await auth.signOut();
+      await logout();
       toast.success('Logged out');
       navigate('/');
-    } catch (error) {
+    } catch {
       toast.error('Logout failed');
     }
   };

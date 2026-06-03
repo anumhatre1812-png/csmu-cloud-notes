@@ -16,11 +16,11 @@ const SUBJECTS = [
   'Maths - III',
   'Digital logic Design (DLD)',
   'Data Structure with C++ (DS C++)',
-  'Analog election circuit (AEC)',
-  'Computer Organisation architecture (AOC)',
+  'Analog Electronics Circuit (AEC)',
+  'Computer Organization & Architecture (COA)',
   'Microprocessor',
-  'DataBase Management System (DBMS)',
-  'Discreet Mathematics',
+  'Database Management System (DBMS)',
+  'Discrete Mathematics',
 ];
 
 const StudentDashboard: React.FC = () => {

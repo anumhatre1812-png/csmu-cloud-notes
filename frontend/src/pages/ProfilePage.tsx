@@ -1,9 +1,9 @@
 import React from 'react';
 import Navbar from '../components/layout/Navbar';
 import { useAuth } from '../contexts/AuthContext';
-import { auth } from '../config/firebase';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Mail, User, Shield } from 'lucide-react';
+import { logout } from '../services/authService';
 import { toast } from 'react-hot-toast';
 
 const ProfilePage: React.FC = () => {
@@ -12,7 +12,7 @@ const ProfilePage: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await auth.signOut();
+      await logout();
       toast.success('Logged out');
       navigate('/');
     } catch {

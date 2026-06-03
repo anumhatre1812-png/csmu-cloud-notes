@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/verifyFirebaseToken.js';
 import { supabase } from '../config/supabase.js';
+import admin from '../config/firebase.js';
 
 export const listAnnouncements = async (_req: AuthRequest, res: Response) => {
   try {
@@ -46,6 +47,31 @@ export const createAnnouncement = async (req: AuthRequest, res: Response) => {
       .single();
 
     if (error) throw error;
+
+    setImmediate(async () => {
+      try {
+        const { data: tokens } = await supabase
+          .from('push_tokens')
+          .select('token');
+
+        if (tokens && tokens.length > 0) {
+          const adminName = req.user.name?.split(' ')[0] || 'Admin';
+          await admin.messaging().sendEachForMulticast({
+            notification: {
+              title: `📢 ${title}`,
+              body: content.length > 100 ? content.slice(0, 100) + '...' : content
+            },
+            data: {
+              type: 'announcement',
+              announcementId: data.id
+            },
+            tokens: tokens.map(t => t.token)
+          });
+        }
+      } catch (notifError) {
+        console.error('Announcement push error:', notifError);
+      }
+    });
 
     return res.status(201).json({ success: true, announcement: data });
   } catch (error: any) {

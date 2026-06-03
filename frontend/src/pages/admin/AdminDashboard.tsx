@@ -111,7 +111,7 @@ const AdminDashboard: React.FC = () => {
 
         <h3 className="text-xl font-bold font-poppins text-textPrimary mb-6 px-1">Category Distribution</h3>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-12">
-          {stats && Object.entries(stats.categoryStats).map(([cat, count], i) => (
+          {stats?.categoryStats && Object.entries(stats.categoryStats).map(([cat, count], i) => (
             <motion.div
               key={cat}
               initial={{ opacity: 0, scale: 0.9 }}
