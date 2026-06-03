@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { AuthRequest } from '../middleware/verifyFirebaseToken.js';
 import { supabase } from '../config/supabase.js';
 import { logAdminAction } from '../services/auditLog.service.js';
+import admin from '../config/firebase.js';
 import { v4 as uuidv4 } from 'uuid';
 
 const VALID_CATEGORIES = new Set([
@@ -118,6 +119,31 @@ export const uploadFile = async (req: AuthRequest, res: Response) => {
         category,
         file_size: file.size,
         file_type: file.mimetype
+      }
+    });
+
+    setImmediate(async () => {
+      try {
+        const { data: tokens } = await supabase
+          .from('push_tokens')
+          .select('token');
+
+        if (tokens && tokens.length > 0) {
+          await admin.messaging().sendEachForMulticast({
+            notification: {
+              title: 'New Resource Available',
+              body: `${dbData.title}${subject ? ` - ${subject}` : ''} has been added to ${category.replace('-', ' ')}`
+            },
+            data: {
+              type: 'new_file',
+              fileId: dbData.id,
+              category: dbData.category
+            },
+            tokens: tokens.map(t => t.token)
+          });
+        }
+      } catch (notifError) {
+        console.error('Push notification error:', notifError);
       }
     });
 

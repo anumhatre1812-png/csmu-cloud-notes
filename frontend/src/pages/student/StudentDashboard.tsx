@@ -12,6 +12,17 @@ const ITEMS_PER_PAGE = 12;
 type SortOption = 'newest' | 'oldest' | 'name-asc' | 'name-desc' | 'size-desc' | 'size-asc' | 'subject-asc';
 type FilterTab = 'all' | 'bookmarked' | 'downloaded';
 
+const SUBJECTS = [
+  'Maths - III',
+  'Digital logic Design (DLD)',
+  'Data Structure with C++ (DS C++)',
+  'Analog election circuit (AEC)',
+  'Computer Organisation architecture (AOC)',
+  'Microprocessor',
+  'DataBase Management System (DBMS)',
+  'Discreet Mathematics',
+];
+
 const StudentDashboard: React.FC = () => {
   const [files, setFiles] = useState<any[]>([]);
   const [filteredFiles, setFilteredFiles] = useState<any[]>([]);
@@ -24,6 +35,7 @@ const StudentDashboard: React.FC = () => {
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [filterTab, setFilterTab] = useState<FilterTab>('all');
+  const [selectedSubject, setSelectedSubject] = useState('');
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [recentDownloads, setRecentDownloads] = useState<any[]>([]);
 
@@ -121,6 +133,10 @@ const StudentDashboard: React.FC = () => {
       result = result.filter(f => recentIds.has(f.id));
     }
 
+    if (selectedSubject) {
+      result = result.filter(f => f.subject === selectedSubject);
+    }
+
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter(f =>
@@ -205,9 +221,9 @@ const StudentDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Filter tabs + Sort */}
-        <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-          <div className="flex items-center gap-2">
+        {/* Filter tabs + Subject */}
+        <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => setFilterTab('all')}
               className={`px-4 py-2 rounded-xl text-sm font-inter transition-all ${filterTab === 'all' ? 'bg-primary text-white' : 'bg-white/50 border border-primary/10 text-textSecondary hover:text-primary'}`}
@@ -257,6 +273,32 @@ const StudentDashboard: React.FC = () => {
           </div>
         </div>
 
+        {/* Subject Filter */}
+        <div className="flex gap-2 overflow-x-auto pb-3 mb-6 scrollbar-thin -mx-2 px-2">
+          <button
+            onClick={() => setSelectedSubject('')}
+            className={`px-4 py-1.5 rounded-full text-xs font-inter font-semibold whitespace-nowrap transition-all shrink-0 ${
+              !selectedSubject
+                ? 'bg-secondary/20 text-secondary border border-secondary/30'
+                : 'bg-white/50 border border-primary/10 text-textSecondary hover:text-primary'
+            }`}
+          >
+            All Subjects
+          </button>
+          {SUBJECTS.map(subject => (
+            <button
+              key={subject}
+              onClick={() => setSelectedSubject(subject)}
+              className={`px-4 py-1.5 rounded-full text-xs font-inter font-semibold whitespace-nowrap transition-all shrink-0 ${
+                selectedSubject === subject
+                  ? 'bg-secondary/20 text-secondary border border-secondary/30'
+                  : 'bg-white/50 border border-primary/10 text-textSecondary hover:text-primary'
+              }`}
+            >
+              {subject}
+            </button>
+          ))}
+        </div>
         {error && !loading && (
           <div className="flex flex-col items-center justify-center py-16 text-textSecondary space-y-4">
             <WifiOff size={48} className="opacity-30" />
