@@ -52,12 +52,16 @@ import statsRoutes from './routes/stats.route.js';
 import filesRoutes from './routes/files.route.js';
 import bookmarksRoutes from './routes/bookmarks.route.js';
 import downloadsRoutes from './routes/downloads.route.js';
+import activityRoutes from './routes/activity.route.js';
+import announcementsRoutes from './routes/announcements.route.js';
 
 app.use('/api/files', filesRoutes);
 app.use('/api/files', uploadRoutes);
 app.use('/api/files', deleteRoutes);
 app.use('/api/admin', statsRoutes);
+app.use('/api/admin', activityRoutes);
 app.use('/api/bookmarks', bookmarksRoutes);
 app.use('/api/downloads', downloadsRoutes);
+app.use('/api/announcements', announcementsRoutes);
 
 export default app;

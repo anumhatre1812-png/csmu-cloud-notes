@@ -93,3 +93,33 @@ export const fetchDownloadHistoryApi = async (limit?: number) => {
   const { data } = await axios.get(`${API_URL}/api/downloads`, { headers, params });
   return data.downloads;
 };
+
+export const fetchActivityLogsApi = async (page = 1, limit = 50) => {
+  const headers = await getAuthHeaders();
+  const { data } = await axios.get(`${API_URL}/api/admin/activity`, { headers, params: { page, limit } });
+  return data;
+};
+
+export const fetchAnnouncementsApi = async () => {
+  const headers = await getAuthHeaders();
+  const { data } = await axios.get(`${API_URL}/api/announcements`, { headers });
+  return data.announcements;
+};
+
+export const createAnnouncementApi = async (payload: { title: string; content: string }) => {
+  const headers = await getAuthHeaders();
+  const { data } = await axios.post(`${API_URL}/api/announcements`, payload, { headers });
+  return data.announcement;
+};
+
+export const updateAnnouncementApi = async (id: string, payload: { title: string; content: string }) => {
+  const headers = await getAuthHeaders();
+  const { data } = await axios.patch(`${API_URL}/api/announcements/${id}`, payload, { headers });
+  return data.announcement;
+};
+
+export const deleteAnnouncementApi = async (id: string) => {
+  const headers = await getAuthHeaders();
+  const { data } = await axios.delete(`${API_URL}/api/announcements/${id}`, { headers });
+  return data;
+};

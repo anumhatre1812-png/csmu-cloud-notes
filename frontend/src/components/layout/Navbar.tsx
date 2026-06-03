@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { LogOut, LayoutDashboard, Upload, Settings, Menu, X, User } from 'lucide-react';
+import { LogOut, LayoutDashboard, Upload, Settings, Menu, X, User, Clock, Megaphone } from 'lucide-react';
 import { auth } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
@@ -24,6 +24,8 @@ const Navbar: React.FC = () => {
     { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Stats' },
     { to: '/admin/upload', icon: Upload, label: 'Upload' },
     { to: '/admin/manage', icon: Settings, label: 'Manage' },
+    { to: '/admin/activity', icon: Clock, label: 'Activity' },
+    { to: '/admin/announcements', icon: Megaphone, label: 'Announcements' },
   ];
 
   return (

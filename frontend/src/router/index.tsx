@@ -6,6 +6,8 @@ import StudentDashboard from '../pages/student/StudentDashboard';
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import AdminUpload from '../pages/admin/AdminUpload';
 import AdminManage from '../pages/admin/AdminManage';
+import AdminActivity from '../pages/admin/AdminActivity';
+import AdminAnnouncements from '../pages/admin/AdminAnnouncements';
 import ProfilePage from '../pages/ProfilePage';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 import AdminRoute from '../components/auth/AdminRoute';
@@ -60,6 +62,22 @@ export const router = createHashRouter([
         element: (
           <AdminRoute>
             <AdminManage />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: 'activity',
+        element: (
+          <AdminRoute>
+            <AdminActivity />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: 'announcements',
+        element: (
+          <AdminRoute>
+            <AdminAnnouncements />
           </AdminRoute>
         ),
       },

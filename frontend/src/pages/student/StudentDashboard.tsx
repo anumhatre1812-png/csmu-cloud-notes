@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import Navbar from '../../components/layout/Navbar';
 import CategoryTabs from '../../components/student/CategoryTabs';
 import FileCard from '../../components/student/FileCard';
+import AnnouncementBanner from '../../components/student/AnnouncementBanner';
 import { fetchFiles, fetchBookmarks, getRecentDownloads } from '../../services/fileService';
 import { Search, Info, RefreshCw, WifiOff, ChevronLeft, ChevronRight, ArrowUpDown, Clock, Heart, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -152,6 +153,7 @@ const StudentDashboard: React.FC = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow container mx-auto px-6 py-8">
+        <AnnouncementBanner />
         {/* Recent Downloads */}
         {recentDownloads.length > 0 && (
           <div className="mb-8">
