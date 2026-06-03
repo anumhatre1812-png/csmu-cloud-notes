@@ -6,6 +6,7 @@ import StudentDashboard from '../pages/student/StudentDashboard';
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import AdminUpload from '../pages/admin/AdminUpload';
 import AdminManage from '../pages/admin/AdminManage';
+import ProfilePage from '../pages/ProfilePage';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 import AdminRoute from '../components/auth/AdminRoute';
 
@@ -63,6 +64,14 @@ export const router = createHashRouter([
         ),
       },
     ],
+  },
+  {
+    path: '/profile',
+    element: (
+      <ProtectedRoute>
+        <ProfilePage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '*',

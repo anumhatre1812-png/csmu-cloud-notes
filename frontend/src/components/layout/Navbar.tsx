@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { LogOut, LayoutDashboard, Upload, Settings, Menu, X } from 'lucide-react';
+import { LogOut, LayoutDashboard, Upload, Settings, Menu, X, User } from 'lucide-react';
 import { auth } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
@@ -52,6 +52,10 @@ const Navbar: React.FC = () => {
                 ))}
               </div>
             )}
+
+            <Link to="/profile" className="hidden md:flex text-textSecondary hover:text-primary transition-colors items-center gap-1.5" title="Profile">
+              <User size={20} />
+            </Link>
 
             <div className="flex items-center gap-2 pl-2 sm:pl-6 border-l border-gray-200">
               <div className="hidden sm:block text-right">

@@ -62,3 +62,34 @@ export const fetchAdminStats = async () => {
   const { data } = await axios.get(`${API_URL}/api/admin/stats`, { headers });
   return data;
 };
+
+export const fetchBookmarksApi = async () => {
+  const headers = await getAuthHeaders();
+  const { data } = await axios.get(`${API_URL}/api/bookmarks`, { headers });
+  return data.bookmarks;
+};
+
+export const addBookmarkApi = async (file_id: string) => {
+  const headers = await getAuthHeaders();
+  const { data } = await axios.post(`${API_URL}/api/bookmarks`, { file_id }, { headers });
+  return data.bookmark;
+};
+
+export const removeBookmarkApi = async (bookmarkId: string) => {
+  const headers = await getAuthHeaders();
+  const { data } = await axios.delete(`${API_URL}/api/bookmarks/${bookmarkId}`, { headers });
+  return data;
+};
+
+export const logDownloadApi = async (payload: { file_id: string; file_title?: string; file_category?: string; file_size?: number }) => {
+  const headers = await getAuthHeaders();
+  const { data } = await axios.post(`${API_URL}/api/downloads`, payload, { headers });
+  return data.download;
+};
+
+export const fetchDownloadHistoryApi = async (limit?: number) => {
+  const headers = await getAuthHeaders();
+  const params = limit ? { limit } : {};
+  const { data } = await axios.get(`${API_URL}/api/downloads`, { headers, params });
+  return data.downloads;
+};

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Download, FileText, Calendar, User, Book, Eye, X } from 'lucide-react';
-import { getDownloadUrl, downloadFile } from '../../services/fileService';
+import { Download, FileText, Calendar, User, Book, Eye, X, Heart, Share2, Wifi } from 'lucide-react';
+import { getDownloadUrl, downloadFile, addBookmark, removeBookmark, fetchBookmarks, isLocallyBookmarked, toggleLocalBookmark, addRecentDownload, cacheFileForOffline, isFileCachedOffline, logDownload as logDownloadApi } from '../../services/fileService';
 import { toast } from 'react-hot-toast';
 
 interface FileCardProps {
@@ -13,6 +13,80 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [showPdf, setShowPdf] = useState(false);
   const [pdfUrl, setPdfUrl] = useState('');
+  const [bookmarked, setBookmarked] = useState(false);
+  const [bookmarkId, setBookmarkId] = useState<string | null>(null);
+  const [cachedOffline, setCachedOffline] = useState(false);
+
+  useEffect(() => {
+    checkBookmarkStatus();
+    checkOfflineCache();
+  }, []);
+
+  const checkBookmarkStatus = async () => {
+    const local = isLocallyBookmarked(file.id);
+    if (local) {
+      setBookmarked(true);
+    }
+    try {
+      const bookmarks = await fetchBookmarks();
+      const found = bookmarks.find((b: any) => b.file_id === file.id);
+      if (found) {
+        setBookmarked(true);
+        setBookmarkId(found.id);
+      }
+    } catch {
+      // fallback to localStorage
+    }
+  };
+
+  const checkOfflineCache = async () => {
+    const cached = await isFileCachedOffline(file.id);
+    setCachedOffline(cached);
+  };
+
+  const handleBookmark = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (bookmarked) {
+      if (bookmarkId) {
+        try {
+          await removeBookmark(bookmarkId);
+        } catch {}
+      }
+      toggleLocalBookmark(file.id);
+      setBookmarked(false);
+      setBookmarkId(null);
+      toast.success('Removed from bookmarks');
+    } else {
+      try {
+        const result = await addBookmark(file.id);
+        setBookmarkId(result.id);
+        setBookmarked(true);
+      } catch {
+        toggleLocalBookmark(file.id);
+        setBookmarked(true);
+      }
+      toast.success('Added to bookmarks');
+    }
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const shareData = {
+      title: file.title,
+      text: `Check out "${file.title}" on CSMU Cloud Notes${file.subject ? ` - ${file.subject}` : ''}`,
+      url: window.location.href,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch {
+        // user cancelled
+      }
+    } else {
+      await navigator.clipboard.writeText(shareData.text);
+      toast.success('Copied to clipboard');
+    }
+  };
 
   const handleDownload = async () => {
     setIsDownloading(true);
@@ -28,6 +102,8 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(blobUrl);
+      addRecentDownload(file);
+      recordDownload(file.id, blob);
       toast.success('Download complete!');
     } catch (error) {
       toast.error('Download failed');
@@ -37,9 +113,17 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
     }
   };
 
+  const recordDownload = async (fileId: string, blob: Blob) => {
+    try {
+      await logDownloadApi({ file_id: fileId, file_title: file.title, file_category: file.category, file_size: file.file_size });
+      cacheFileForOffline(fileId, blob);
+      setCachedOffline(true);
+    } catch {}
+  };
+
   const handleViewPdf = async () => {
     try {
-      const url = await getDownloadUrl(file.id);
+      let url = await getDownloadUrl(file.id);
       setPdfUrl(url);
       setShowPdf(true);
     } catch {
@@ -64,8 +148,30 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="glass-card p-6 flex flex-col gap-4 group"
+        className="glass-card p-6 flex flex-col gap-4 group relative"
       >
+        <div className="absolute top-3 right-3 flex items-center gap-1">
+          {cachedOffline && (
+            <span className="p-1.5 text-green-500" title="Available offline">
+              <Wifi size={14} />
+            </span>
+          )}
+          <button
+            onClick={handleBookmark}
+            className={`p-1.5 rounded-full transition-colors ${bookmarked ? 'text-red-500' : 'text-textSecondary opacity-0 group-hover:opacity-100'}`}
+            title={bookmarked ? 'Remove bookmark' : 'Add bookmark'}
+          >
+            <Heart size={16} fill={bookmarked ? 'currentColor' : 'none'} />
+          </button>
+          <button
+            onClick={handleShare}
+            className="p-1.5 rounded-full text-textSecondary opacity-0 group-hover:opacity-100 transition-colors hover:text-primary"
+            title="Share"
+          >
+            <Share2 size={16} />
+          </button>
+        </div>
+
         <div className="flex justify-between items-start">
           <div className="p-3 bg-primary/10 rounded-xl text-primary group-hover:bg-primary group-hover:text-white transition-colors">
             <FileText size={24} />

@@ -50,10 +50,14 @@ import uploadRoutes from './routes/upload.route.js';
 import deleteRoutes from './routes/delete.route.js';
 import statsRoutes from './routes/stats.route.js';
 import filesRoutes from './routes/files.route.js';
+import bookmarksRoutes from './routes/bookmarks.route.js';
+import downloadsRoutes from './routes/downloads.route.js';
 
 app.use('/api/files', filesRoutes);
 app.use('/api/files', uploadRoutes);
 app.use('/api/files', deleteRoutes);
 app.use('/api/admin', statsRoutes);
+app.use('/api/bookmarks', bookmarksRoutes);
+app.use('/api/downloads', downloadsRoutes);
 
 export default app;

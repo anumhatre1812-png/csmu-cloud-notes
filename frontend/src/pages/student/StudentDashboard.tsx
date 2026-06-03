@@ -2,12 +2,14 @@ import React, { useEffect, useState, useCallback } from 'react';
 import Navbar from '../../components/layout/Navbar';
 import CategoryTabs from '../../components/student/CategoryTabs';
 import FileCard from '../../components/student/FileCard';
-import { fetchFiles } from '../../services/fileService';
-import { Search, Info, RefreshCw, WifiOff, ChevronLeft, ChevronRight } from 'lucide-react';
+import { fetchFiles, fetchBookmarks, getRecentDownloads } from '../../services/fileService';
+import { Search, Info, RefreshCw, WifiOff, ChevronLeft, ChevronRight, ArrowUpDown, Clock, Heart, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
-
 const ITEMS_PER_PAGE = 12;
+
+type SortOption = 'newest' | 'oldest' | 'name-asc' | 'name-desc' | 'size-desc' | 'size-asc' | 'subject-asc';
+type FilterTab = 'all' | 'bookmarked' | 'downloaded';
 
 const StudentDashboard: React.FC = () => {
   const [files, setFiles] = useState<any[]>([]);
@@ -18,14 +20,21 @@ const StudentDashboard: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [showSortMenu, setShowSortMenu] = useState(false);
+  const [filterTab, setFilterTab] = useState<FilterTab>('all');
+  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
+  const [recentDownloads, setRecentDownloads] = useState<any[]>([]);
 
   useEffect(() => {
     loadFiles();
+    loadBookmarks();
+    loadRecentDownloads();
   }, []);
 
   useEffect(() => {
     filterFiles();
-  }, [files, activeCategory, searchQuery]);
+  }, [files, activeCategory, searchQuery, sortBy, filterTab, bookmarkedIds]);
 
   const loadFiles = async () => {
     try {
@@ -43,12 +52,30 @@ const StudentDashboard: React.FC = () => {
     }
   };
 
+  const loadBookmarks = async () => {
+    try {
+      const bookmarks = await fetchBookmarks();
+      const ids = new Set(bookmarks.map((b: any) => b.file_id) as string[]);
+      setBookmarkedIds(ids);
+    } catch {
+      // use localStorage fallback
+      const local: string[] = JSON.parse(localStorage.getItem('csmu_local_bookmarks') || '[]');
+      setBookmarkedIds(new Set(local));
+    }
+  };
+
+  const loadRecentDownloads = () => {
+    setRecentDownloads(getRecentDownloads());
+  };
+
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     setCurrentPage(1);
     try {
       const data = await fetchFiles();
       setFiles(data);
+      loadBookmarks();
+      loadRecentDownloads();
       toast.success('Notes updated');
     } catch {
       toast.error('Refresh failed');
@@ -57,18 +84,51 @@ const StudentDashboard: React.FC = () => {
     }
   }, []);
 
+  const sortFiles = (list: any[], option: SortOption): any[] => {
+    const sorted = [...list];
+    switch (option) {
+      case 'newest':
+        return sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      case 'oldest':
+        return sorted.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+      case 'name-asc':
+        return sorted.sort((a, b) => a.title.localeCompare(b.title));
+      case 'name-desc':
+        return sorted.sort((a, b) => b.title.localeCompare(a.title));
+      case 'size-desc':
+        return sorted.sort((a, b) => (b.file_size || 0) - (a.file_size || 0));
+      case 'size-asc':
+        return sorted.sort((a, b) => (a.file_size || 0) - (b.file_size || 0));
+      case 'subject-asc':
+        return sorted.sort((a, b) => (a.subject || '').localeCompare(b.subject || ''));
+      default:
+        return sorted;
+    }
+  };
+
   const filterFiles = () => {
     let result = files;
+
     if (activeCategory !== 'all') {
       result = result.filter(f => f.category === activeCategory);
     }
+
+    if (filterTab === 'bookmarked') {
+      result = result.filter(f => bookmarkedIds.has(f.id));
+    } else if (filterTab === 'downloaded') {
+      const recentIds = new Set(recentDownloads.map((d: any) => d.id));
+      result = result.filter(f => recentIds.has(f.id));
+    }
+
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      result = result.filter(f => 
-        f.title.toLowerCase().includes(q) || 
+      result = result.filter(f =>
+        f.title.toLowerCase().includes(q) ||
         (f.subject && f.subject.toLowerCase().includes(q))
       );
     }
+
+    result = sortFiles(result, sortBy);
     setFilteredFiles(result);
     setCurrentPage(1);
   };
@@ -76,15 +136,52 @@ const StudentDashboard: React.FC = () => {
   const totalPages = Math.ceil(filteredFiles.length / ITEMS_PER_PAGE);
   const paginatedFiles = filteredFiles.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
+  const sortOptions: { value: SortOption; label: string }[] = [
+    { value: 'newest', label: 'Newest First' },
+    { value: 'oldest', label: 'Oldest First' },
+    { value: 'name-asc', label: 'Name A-Z' },
+    { value: 'name-desc', label: 'Name Z-A' },
+    { value: 'size-desc', label: 'Size (Largest)' },
+    { value: 'size-asc', label: 'Size (Smallest)' },
+    { value: 'subject-asc', label: 'Subject A-Z' },
+  ];
+
+  const getSortLabel = () => sortOptions.find(o => o.value === sortBy)?.label || 'Sort';
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow container mx-auto px-6 py-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-          <div className="flex items-center gap-4">
+        {/* Recent Downloads */}
+        {recentDownloads.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Clock size={18} className="text-primary" />
+              <h2 className="text-lg font-bold font-poppins text-textPrimary">Recent Downloads</h2>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
+              {recentDownloads.slice(0, 8).map((file: any) => (
+                <div
+                  key={file.id}
+                  className="flex-shrink-0 w-48 p-3 glass-card cursor-pointer hover:shadow-md transition-shadow"
+                  title={file.title}
+                >
+                  <p className="text-sm font-semibold font-poppins text-textPrimary truncate">{file.title}</p>
+                  <p className="text-xs text-textSecondary font-inter truncate">{file.subject || 'General'}</p>
+                  <p className="text-[10px] text-textSecondary font-inter mt-1">
+                    {new Date(file.downloadedAt).toLocaleDateString()}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
+          <div className="flex items-center gap-4 flex-wrap">
             <CategoryTabs activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <div className="relative w-full md:w-80">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary" size={20} />
               <input
@@ -103,6 +200,58 @@ const StudentDashboard: React.FC = () => {
             >
               <RefreshCw size={20} className={refreshing ? 'animate-spin' : ''} />
             </button>
+          </div>
+        </div>
+
+        {/* Filter tabs + Sort */}
+        <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setFilterTab('all')}
+              className={`px-4 py-2 rounded-xl text-sm font-inter transition-all ${filterTab === 'all' ? 'bg-primary text-white' : 'bg-white/50 border border-primary/10 text-textSecondary hover:text-primary'}`}
+            >
+              All Notes
+            </button>
+            <button
+              onClick={() => setFilterTab('bookmarked')}
+              className={`px-4 py-2 rounded-xl text-sm font-inter flex items-center gap-1.5 transition-all ${filterTab === 'bookmarked' ? 'bg-primary text-white' : 'bg-white/50 border border-primary/10 text-textSecondary hover:text-primary'}`}
+            >
+              <Heart size={14} />
+              Bookmarked
+            </button>
+            <button
+              onClick={() => setFilterTab('downloaded')}
+              className={`px-4 py-2 rounded-xl text-sm font-inter flex items-center gap-1.5 transition-all ${filterTab === 'downloaded' ? 'bg-primary text-white' : 'bg-white/50 border border-primary/10 text-textSecondary hover:text-primary'}`}
+            >
+              <Download size={14} />
+              Downloaded
+            </button>
+          </div>
+
+          <div className="relative">
+            <button
+              onClick={() => setShowSortMenu(!showSortMenu)}
+              className="px-4 py-2 bg-white/50 border border-primary/10 rounded-xl text-sm font-inter text-textSecondary hover:text-primary flex items-center gap-2 transition-all"
+            >
+              <ArrowUpDown size={14} />
+              {getSortLabel()}
+            </button>
+            {showSortMenu && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setShowSortMenu(false)} />
+                <div className="absolute right-0 top-full mt-1 z-20 bg-white rounded-xl shadow-xl border border-primary/10 py-2 min-w-[180px]">
+                  {sortOptions.map(opt => (
+                    <button
+                      key={opt.value}
+                      onClick={() => { setSortBy(opt.value); setShowSortMenu(false); }}
+                      className={`w-full text-left px-4 py-2 text-sm font-inter hover:bg-primary/5 transition-colors ${sortBy === opt.value ? 'text-primary font-semibold' : 'text-textSecondary'}`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
 
