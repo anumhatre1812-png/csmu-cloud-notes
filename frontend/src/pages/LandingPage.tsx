@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { BookOpen, Shield, Download } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 const LandingPage: React.FC = () => {
+  const { user, loading, isAdmin } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (loading) return;
+    if (user) {
+      navigate(isAdmin ? '/admin/dashboard' : '/student/dashboard', { replace: true });
+    }
+  }, [user, loading, isAdmin, navigate]);
 
   return (
     <div className="min-h-screen flex flex-col">
