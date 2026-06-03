@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Download, FileText, Calendar, User, Book, Eye, X, Heart, Share2, Wifi } from 'lucide-react';
+import { Download, FileText, Calendar, User, Book, Eye, X, Heart, Share2, Wifi, Image, FileSpreadsheet, FileSlides, FilePenLine } from 'lucide-react';
 import { getDownloadUrl, downloadFile, addBookmark, removeBookmark, fetchBookmarks, isLocallyBookmarked, toggleLocalBookmark, addRecentDownload, cacheFileForOffline, isFileCachedOffline, logDownload as logDownloadApi } from '../../services/fileService';
 import { toast } from 'react-hot-toast';
 
@@ -8,14 +8,50 @@ interface FileCardProps {
   file: any;
 }
 
+const isImageType = (mimeType?: string) => {
+  if (!mimeType) return false;
+  return mimeType.startsWith('image/');
+};
+
+const isOfficeDoc = (mimeType?: string) => {
+  if (!mimeType) return false;
+  return mimeType.includes('officedocument') || mimeType.includes('ms-powerpoint') || mimeType.includes('ms-excel') || mimeType === 'application/msword';
+};
+
+const isPdfType = (mimeType?: string, fileName?: string) => {
+  if (mimeType === 'application/pdf') return true;
+  if (fileName?.toLowerCase().endsWith('.pdf')) return true;
+  return false;
+};
+
+const getOfficeIcon = (mimeType: string) => {
+  if (mimeType.includes('spreadsheet') || mimeType.includes('ms-excel')) return FileSpreadsheet;
+  if (mimeType.includes('presentation') || mimeType.includes('ms-powerpoint')) return FileSlides;
+  return FilePenLine;
+};
+
+const getPreviewButtonLabel = (mimeType?: string) => {
+  if (!mimeType) return 'View';
+  if (mimeType.startsWith('image/')) return 'Preview';
+  if (isPdfType(mimeType)) return 'View';
+  if (isOfficeDoc(mimeType)) return 'Preview';
+  return 'View';
+};
+
 const FileCard: React.FC<FileCardProps> = ({ file }) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
-  const [showPdf, setShowPdf] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [previewType, setPreviewType] = useState<'pdf' | 'image' | 'office' | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [bookmarkId, setBookmarkId] = useState<string | null>(null);
   const [cachedOffline, setCachedOffline] = useState(false);
+
+  const fileType = file.file_type;
+
+  const canPreview = isPdfType(fileType, file.file_name) || isImageType(fileType) || isOfficeDoc(fileType);
 
   useEffect(() => {
     checkBookmarkStatus();
@@ -121,14 +157,33 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
     } catch {}
   };
 
-  const handleViewPdf = async () => {
+  const handlePreview = async () => {
     try {
-      let url = await getDownloadUrl(file.id);
-      setPdfUrl(url);
-      setShowPdf(true);
+      const url = await getDownloadUrl(file.id);
+      setPreviewUrl(url);
+
+      if (isPdfType(fileType, file.file_name)) {
+        setPreviewType('pdf');
+      } else if (fileType && isImageType(fileType)) {
+        setPreviewType('image');
+        setImageLoaded(false);
+      } else if (fileType && isOfficeDoc(fileType)) {
+        setPreviewType('office');
+      } else {
+        // Fallback: try PDF viewer for unknown types
+        setPreviewType('pdf');
+      }
+      setShowPreview(true);
     } catch {
-      toast.error('Failed to open file');
+      toast.error('Failed to open preview');
     }
+  };
+
+  const closePreview = () => {
+    setShowPreview(false);
+    setPreviewUrl('');
+    setPreviewType(null);
+    setImageLoaded(false);
   };
 
   const formatSize = (bytes: number) => {
@@ -139,7 +194,7 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const isPdf = file.file_name?.endsWith('.pdf');
+  const OfficeIcon = fileType && isOfficeDoc(fileType) ? getOfficeIcon(fileType) : FileText;
 
   return (
     <>
@@ -174,7 +229,13 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
 
         <div className="flex justify-between items-start">
           <div className="p-3 bg-primary/10 rounded-xl text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-            <FileText size={24} />
+            {isImageType(fileType) ? (
+              <Image size={24} />
+            ) : isOfficeDoc(fileType) ? (
+              <OfficeIcon size={24} />
+            ) : (
+              <FileText size={24} />
+            )}
           </div>
           <span className="px-3 py-1 bg-secondary/10 text-secondary text-xs font-bold font-montserrat rounded-full uppercase">
             {file.category.replace('-', ' ')}
@@ -206,19 +267,19 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
         </div>
 
         <div className="flex gap-2 mt-2">
-          {isPdf && (
+          {canPreview && (
             <button
-              onClick={handleViewPdf}
+              onClick={handlePreview}
               className="flex-1 btn-secondary flex items-center justify-center gap-2 py-3 text-sm"
             >
               <Eye size={16} />
-              <span>View</span>
+              <span>{getPreviewButtonLabel(fileType)}</span>
             </button>
           )}
           <button
             onClick={handleDownload}
             disabled={isDownloading}
-            className={`btn-primary flex items-center justify-center gap-2 py-3 disabled:opacity-50 ${isPdf ? 'flex-1' : 'w-full'}`}
+            className={`btn-primary flex items-center justify-center gap-2 py-3 disabled:opacity-50 ${canPreview ? 'flex-1' : 'w-full'}`}
           >
             {isDownloading ? (
               <span className="text-sm">{downloadProgress}%</span>
@@ -244,21 +305,93 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
       </motion.div>
 
       <AnimatePresence>
-        {showPdf && pdfUrl && (
+        {showPreview && previewUrl && previewType === 'pdf' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-black/80 flex flex-col"
           >
-            <div className="flex items-center justify-between px-4 py-3 bg-white/10 backdrop-blur-lg">
-              <span className="text-white font-medium truncate">{file.title}</span>
-              <button onClick={() => { setShowPdf(false); setPdfUrl(''); }} className="p-2 text-white hover:bg-white/10 rounded-full transition-colors">
+            <div className="flex items-center justify-between px-4 py-3 bg-black/50 backdrop-blur-lg">
+              <div className="flex items-center gap-3 min-w-0">
+                <FileText size={20} className="text-white shrink-0" />
+                <span className="text-white font-medium truncate">{file.title}</span>
+              </div>
+              <button onClick={closePreview} className="p-2 text-white hover:bg-white/10 rounded-full transition-colors">
                 <X size={24} />
               </button>
             </div>
             <iframe
-              src={pdfUrl}
+              src={previewUrl}
+              className="flex-1 w-full"
+              title={file.title}
+            />
+          </motion.div>
+        )}
+
+        {showPreview && previewUrl && previewType === 'image' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/90 flex flex-col"
+            onClick={closePreview}
+          >
+            <div className="flex items-center justify-between px-4 py-3 bg-black/30 backdrop-blur-lg">
+              <div className="flex items-center gap-3 min-w-0">
+                <Image size={20} className="text-white shrink-0" />
+                <span className="text-white font-medium truncate">{file.title}</span>
+              </div>
+              <button onClick={(e) => { e.stopPropagation(); closePreview(); }} className="p-2 text-white hover:bg-white/10 rounded-full transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+            <div className="flex-1 flex items-center justify-center p-4 sm:p-8" onClick={(e) => e.stopPropagation()}>
+              {!imageLoaded && (
+                <div className="w-10 h-10 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+              )}
+              <motion.img
+                src={previewUrl}
+                alt={file.title}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: imageLoaded ? 1 : 0, scale: imageLoaded ? 1 : 0.95 }}
+                transition={{ duration: 0.2 }}
+                onLoad={() => setImageLoaded(true)}
+                className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl"
+                style={{ display: imageLoaded ? 'block' : 'none' }}
+              />
+            </div>
+            <div className="flex justify-center gap-4 px-4 py-3 bg-black/30 backdrop-blur-lg">
+              <a
+                href={previewUrl}
+                download={file.file_name || file.title}
+                className="flex items-center gap-2 px-5 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-colors text-sm"
+              >
+                <Download size={16} />
+                Download Image
+              </a>
+            </div>
+          </motion.div>
+        )}
+
+        {showPreview && previewUrl && previewType === 'office' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/80 flex flex-col"
+          >
+            <div className="flex items-center justify-between px-4 py-3 bg-black/50 backdrop-blur-lg">
+              <div className="flex items-center gap-3 min-w-0">
+                <OfficeIcon size={20} className="text-white shrink-0" />
+                <span className="text-white font-medium truncate">{file.title}</span>
+              </div>
+              <button onClick={closePreview} className="p-2 text-white hover:bg-white/10 rounded-full transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+            <iframe
+              src={`https://docs.google.com/viewer?url=${encodeURIComponent(previewUrl)}&embedded=true&chrome=false`}
               className="flex-1 w-full"
               title={file.title}
             />

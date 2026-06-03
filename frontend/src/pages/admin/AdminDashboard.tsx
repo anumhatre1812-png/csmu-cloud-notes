@@ -1,16 +1,37 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Navbar from '../../components/layout/Navbar';
 import { motion } from 'framer-motion';
-import { Clock, Database, FileText, Files, HardDrive, BarChart3, TrendingUp } from 'lucide-react';
+import { Clock, Database, FileText, Files, HardDrive, BarChart3, TrendingUp, RefreshCw } from 'lucide-react';
 import { fetchAdminStats } from '../../services/apiService';
+import { supabase } from '../../config/supabase';
 import { toast } from 'react-hot-toast';
 
 const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  const channelRef = useRef<any>(null);
+
   useEffect(() => {
     loadStats();
+
+    // Subscribe to real-time changes on the files table
+    const channel = supabase
+      .channel('admin-stats-changes')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'files' },
+        () => {
+          // Auto-refresh stats on any file change
+          loadStats();
+        }
+      )
+      .subscribe();
+
+    channelRef.current = channel;
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const loadStats = async () => {

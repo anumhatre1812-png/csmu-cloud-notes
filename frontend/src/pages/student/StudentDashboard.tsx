@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Navbar from '../../components/layout/Navbar';
 import CategoryTabs from '../../components/student/CategoryTabs';
 import FileCard from '../../components/student/FileCard';
 import AnnouncementBanner from '../../components/student/AnnouncementBanner';
 import { fetchFiles, fetchBookmarks, getRecentDownloads } from '../../services/fileService';
-import { Search, Info, RefreshCw, WifiOff, ChevronLeft, ChevronRight, ArrowUpDown, Clock, Heart, Download } from 'lucide-react';
+import { supabase } from '../../config/supabase';
+import { Search, Info, RefreshCw, WifiOff, ChevronLeft, ChevronRight, ArrowUpDown, Clock, Heart, Download, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 const ITEMS_PER_PAGE = 12;
@@ -39,10 +40,48 @@ const StudentDashboard: React.FC = () => {
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [recentDownloads, setRecentDownloads] = useState<any[]>([]);
 
+  const channelRef = useRef<any>(null);
+
   useEffect(() => {
     loadFiles();
     loadBookmarks();
     loadRecentDownloads();
+
+    // Subscribe to real-time INSERT events on the files table
+    const channel = supabase
+      .channel('student-files-changes')
+      .on('postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'files' },
+        (payload) => {
+          const newFile = payload.new as any;
+          // Show an attractive toast for the new file
+          toast(
+            (t) => (
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg shrink-0">
+                  <Sparkles size={18} className="text-primary" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-bold text-sm font-poppins text-textPrimary">{newFile.title}</p>
+                  <p className="text-xs font-inter text-textSecondary">
+                    New {newFile.category?.replace('-', ' ')} uploaded
+                  </p>
+                </div>
+              </div>
+            ),
+            { duration: 6000 }
+          );
+          // Prepend the new file to the list so it shows instantly
+          setFiles((prev) => [newFile, ...prev]);
+        }
+      )
+      .subscribe();
+
+    channelRef.current = channel;
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
