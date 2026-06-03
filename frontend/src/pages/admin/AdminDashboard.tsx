@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Navbar from '../../components/layout/Navbar';
 import { motion } from 'framer-motion';
-import { Clock, Database, FileText, Files, HardDrive, BarChart3, TrendingUp, RefreshCw } from 'lucide-react';
+import { Clock, Database, FileText, Files, HardDrive, BarChart3, TrendingUp } from 'lucide-react';
 import { fetchAdminStats } from '../../services/apiService';
 import { supabase } from '../../config/supabase';
 import { toast } from 'react-hot-toast';

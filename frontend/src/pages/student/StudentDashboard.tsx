@@ -56,7 +56,7 @@ const StudentDashboard: React.FC = () => {
           const newFile = payload.new as any;
           // Show an attractive toast for the new file
           toast(
-            (t) => (
+            (_t) => (
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-primary/10 rounded-lg shrink-0">
                   <Sparkles size={18} className="text-primary" />

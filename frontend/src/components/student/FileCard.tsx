@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Download, FileText, Calendar, User, Book, Eye, X, Heart, Share2, Wifi, Image, FileSpreadsheet, FileSlides, FilePenLine } from 'lucide-react';
+import { Download, FileText, Calendar, User, Book, Eye, X, Heart, Share2, Wifi, Image, FileSpreadsheet, FilePenLine } from 'lucide-react';
 import { getDownloadUrl, downloadFile, addBookmark, removeBookmark, fetchBookmarks, isLocallyBookmarked, toggleLocalBookmark, addRecentDownload, cacheFileForOffline, isFileCachedOffline, logDownload as logDownloadApi } from '../../services/fileService';
 import { toast } from 'react-hot-toast';
 
@@ -26,7 +26,7 @@ const isPdfType = (mimeType?: string, fileName?: string) => {
 
 const getOfficeIcon = (mimeType: string) => {
   if (mimeType.includes('spreadsheet') || mimeType.includes('ms-excel')) return FileSpreadsheet;
-  if (mimeType.includes('presentation') || mimeType.includes('ms-powerpoint')) return FileSlides;
+  if (mimeType.includes('presentation') || mimeType.includes('ms-powerpoint')) return FileText;
   return FilePenLine;
 };
 
