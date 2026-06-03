@@ -129,10 +129,11 @@ export const uploadFile = async (req: AuthRequest, res: Response) => {
           .select('token');
 
         if (tokens && tokens.length > 0) {
+          const adminName = req.user.name?.split(' ')[0] || 'Admin';
           await admin.messaging().sendEachForMulticast({
             notification: {
-              title: 'New Resource Available',
-              body: `${dbData.title}${subject ? ` - ${subject}` : ''} has been added to ${category.replace('-', ' ')}`
+              title: `Admin ${adminName} has uploaded new ${category.replace('-', ' ')}`,
+              body: dbData.title
             },
             data: {
               type: 'new_file',
