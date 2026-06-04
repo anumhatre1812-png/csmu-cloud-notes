@@ -159,7 +159,7 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
 
   const handlePreview = async () => {
     try {
-      const url = await getDownloadUrl(file.id);
+      const url = file.file_url || await getDownloadUrl(file.id);
       setPreviewUrl(url);
 
       if (isPdfType(fileType, file.file_name)) {
@@ -170,7 +170,6 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
       } else if (fileType && isOfficeDoc(fileType)) {
         setPreviewType('office');
       } else {
-        // Fallback: try PDF viewer for unknown types
         setPreviewType('pdf');
       }
       setShowPreview(true);
