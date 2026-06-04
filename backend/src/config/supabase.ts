@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabaseServiceRoleKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').replace(/\s/g, '');
 
 if (!supabaseUrl || !supabaseServiceRoleKey) {
   console.error('Missing Supabase environment variables');

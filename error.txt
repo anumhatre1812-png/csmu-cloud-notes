@@ -1,0 +1,156 @@
+Headers.set: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJl
+ZiI6Imdlamh6eGp0Z2p6bW9xbnFodGxqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDM3ODY5NSwiZXh
+wIjoyMDk1OTU0Njk1fQ.FcgTasCVE5ZQ1wRow
+
+csmu-cloud-notes-pro…p/api/admin/stats:1 
+ Failed to load resource: the server responded with a status of 500 ()
+
+csmu-cloud-notes-pro…/api/files/upload:1 
+ Failed to load resource: the server responded with a status of 500 ()
+csmu-cloud-notes-pro…/api/files/upload:1 
+ Failed to load resource: the server responded with a status of 500 ()
+csmu-cloud-notes-pro…/api/files/upload:1 
+ Failed to load resource: the server responded with a status of 500 ()
+csmu-cloud-notes-pro…/api/files/upload:1 
+ Failed to load resource: the server responded with a status of 500 ()
+index-CyEC9KUM.js:198 
+ POST https://csmu-cloud-notes-production.up.railway.app/api/files/upload 500 (Internal Server Error)
+(anonymous)	@	index-CyEC9KUM.js:198
+xhr	@	index-CyEC9KUM.js:198
+UN	@	index-CyEC9KUM.js:200
+_request	@	index-CyEC9KUM.js:204
+request	@	index-CyEC9KUM.js:200
+(anonymous)	@	index-CyEC9KUM.js:204
+(anonymous)	@	index-CyEC9KUM.js:196
+rP	@	index-CyEC9KUM.js:204
+await in rP		
+onSubmit	@	index-CyEC9KUM.js:227
+kd	@	index-CyEC9KUM.js:8
+(anonymous)	@	index-CyEC9KUM.js:8
+dn	@	index-CyEC9KUM.js:8
+Pd	@	index-CyEC9KUM.js:8
+xp	@	index-CyEC9KUM.js:9
+yp	@	index-CyEC9KUM.js:9
+
+
+railway log error :- 
+
+
+
+    '     ZiI6Imdlamh6eGp0Z2p6bW9xbnFodGxqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDM3ODY5NSwiZXh\n' +
+    '     wIjoyMDk1OTU0Njk1fQ.FcgTasCVE5ZQ1wRowPXNeGyf5UxdQIyyvRXH5K8mC4o" is an invalid header value.\n' +
+    '    at webidl.errors.exception (node:internal/deps/undici/undici:1394:14)\n' +
+    '    at webidl.errors.invalidArgument (node:internal/deps/undici/undici:1405:28)\n' +
+    '    at Headers.set (node:internal/deps/undici/undici:1958:31)\n' +
+    '    at file:///app/backend/node_modules/@supabase/supabase-js/dist/index.mjs:332:39\n' +
+    '    at runNextTicks (node:internal/process/task_queues:60:5)\n' +
+    '    at listOnTimeout (node:internal/timers:540:9)\n' +
+  hint: '',
+  code: ''
+}
+GET /api/bookmarks 500 7007.129 ms - 301
+List announcements error: {
+  message: 'TypeError: Headers.set: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJl\n' +
+    '     ZiI6Imdlamh6eGp0Z2p6bW9xbnFodGxqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDM3ODY5NSwiZXh\n' +
+    '     wIjoyMDk1OTU0Njk1fQ.FcgTasCVE5ZQ1wRowPXNeGyf5UxdQIyyvRXH5K8mC4o" is an invalid header value.',
+  details: 'TypeError: Headers.set: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJl\n' +
+    '     ZiI6Imdlamh6eGp0Z2p6bW9xbnFodGxqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDM3ODY5NSwiZXh\n' +
+    '     wIjoyMDk1OTU0Njk1fQ.FcgTasCVE5ZQ1wRowPXNeGyf5UxdQIyyvRXH5K8mC4o" is an invalid header value.\n' +
+    '    at webidl.errors.exception (node:internal/deps/undici/undici:1394:14)\n' +
+    '    at webidl.errors.invalidArgument (node:internal/deps/undici/undici:1405:28)\n' +
+    '    at Headers.set (node:internal/deps/undici/undici:1958:31)\n' +
+    '    at file:///app/backend/node_modules/@supabase/supabase-js/dist/index.mjs:332:39\n' +
+    '    at async executeWithRetry (file:///app/backend/node_modules/@supabase/postgrest-js/dist/index.mjs:261:14)\n' +
+    '    at async listAnnouncements (file:///app/backend/dist/controllers/announcements.controller.js:5:33)',
+    '     wIjoyMDk1OTU0Njk1fQ.FcgTasCVE5ZQ1wRowPXNeGyf5UxdQIyyvRXH5K8mC4o" is an invalid header value.\n' +
+  hint: '',
+    '    at webidl.errors.exception (node:internal/deps/undici/undici:1394:14)\n' +
+  code: ''
+    '    at webidl.errors.invalidArgument (node:internal/deps/undici/undici:1405:28)\n' +
+    '    at Headers.set (node:internal/deps/undici/undici:1958:31)\n' +
+    '    at file:///app/backend/node_modules/@supabase/supabase-js/dist/index.mjs:332:39\n' +
+}
+GET /api/announcements 500 7005.883 ms - 301
+    '    at async executeWithRetry (file:///app/backend/node_modules/@supabase/postgrest-js/dist/index.mjs:261:14)\n' +
+List files error: {
+    '    at async listFiles (file:///app/backend/dist/controllers/files.controller.js:5:33)',
+  message: 'TypeError: Headers.set: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJl\n' +
+    '     ZiI6Imdlamh6eGp0Z2p6bW9xbnFodGxqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDM3ODY5NSwiZXh\n' +
+    '     wIjoyMDk1OTU0Njk1fQ.FcgTasCVE5ZQ1wRowPXNeGyf5UxdQIyyvRXH5K8mC4o" is an invalid header value.',
+  details: 'TypeError: Headers.set: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJl\n' +
+    '     ZiI6Imdlamh6eGp0Z2p6bW9xbnFodGxqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDM3ODY5NSwiZXh\n' +
+  hint: '',
+  code: ''
+}
+GET /api/files 500 7003.169 ms - 301
+POST /api/notifications/register-token 200 7005.131 ms - 16
+  errorInfo: {
+    code: 'auth/argument-error',
+    message: 'Decoding Firebase ID token failed. Make sure you passed the entire string JWT which represents an ID token. See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.'
+  },
+  codePrefix: 'auth'
+}
+POST /api/notifications/unregister-token 401 1.541 ms - 25
+Error verifying Firebase token: FirebaseAuthError: Decoding Firebase ID token failed. Make sure you passed the entire string JWT which represents an ID token. See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.
+    at /app/backend/node_modules/firebase-admin/lib/auth/token-verifier.js:174:23
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+Error verifying Firebase token: FirebaseAuthError: Decoding Firebase ID token failed. Make sure you passed the entire string JWT which represents an ID token. See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.
+    at /app/backend/node_modules/firebase-admin/lib/auth/token-verifier.js:174:23
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+  errorInfo: {
+    code: 'auth/argument-error',
+    message: 'Decoding Firebase ID token failed. Make sure you passed the entire string JWT which represents an ID token. See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.'
+  },
+  codePrefix: 'auth'
+}
+POST /api/notifications/unregister-token 401 1.228 ms - 25
+Error verifying Firebase token: FirebaseAuthError: Decoding Firebase ID token failed. Make sure you passed the entire string JWT which represents an ID token. See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.
+    at /app/backend/node_modules/firebase-admin/lib/auth/token-verifier.js:174:23
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+  errorInfo: {
+    code: 'auth/argument-error',
+    message: 'Decoding Firebase ID token failed. Make sure you passed the entire string JWT which represents an ID token. See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.'
+  },
+  codePrefix: 'auth'
+}
+POST /api/notifications/unregister-token 401 1.012 ms - 25
+     wIjoyMDk1OTU0Njk1fQ.FcgTasCVE5ZQ1wRowPXNeGyf5UxdQIyyvRXH5K8mC4o" is an invalid header value.
+    at handleError (file:///app/backend/node_modules/@supabase/storage-js/dist/index.mjs:320:16)
+    at file:///app/backend/node_modules/@supabase/storage-js/dist/index.mjs:369:53
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+  __isStorageError: true,
+  namespace: 'storage',
+  status: undefined,
+  statusCode: undefined,
+  originalError: TypeError: Headers.set: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJl
+       ZiI6Imdlamh6eGp0Z2p6bW9xbnFodGxqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDM3ODY5NSwiZXh
+       wIjoyMDk1OTU0Njk1fQ.FcgTasCVE5ZQ1wRowPXNeGyf5UxdQIyyvRXH5K8mC4o" is an invalid header value.
+      at webidl.errors.exception (node:internal/deps/undici/undici:1394:14)
+      at webidl.errors.invalidArgument (node:internal/deps/undici/undici:1405:28)
+      at Headers.set (node:internal/deps/undici/undici:1958:31)
+      at file:///app/backend/node_modules/@supabase/supabase-js/dist/index.mjs:332:39
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+Upload error: StorageUnknownError: Headers.set: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJl
+     ZiI6Imdlamh6eGp0Z2p6bW9xbnFodGxqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDM3ODY5NSwiZXh
+}
+POST /api/files/upload 500 368.199 ms - 290
+Upload error: StorageUnknownError: Headers.set: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJl
+     ZiI6Imdlamh6eGp0Z2p6bW9xbnFodGxqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDM3ODY5NSwiZXh
+     wIjoyMDk1OTU0Njk1fQ.FcgTasCVE5ZQ1wRowPXNeGyf5UxdQIyyvRXH5K8mC4o" is an invalid header value.
+    at handleError (file:///app/backend/node_modules/@supabase/storage-js/dist/index.mjs:320:16)
+    at file:///app/backend/node_modules/@supabase/storage-js/dist/index.mjs:369:53
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+  __isStorageError: true,
+  namespace: 'storage',
+  status: undefined,
+  statusCode: undefined,
+  originalError: TypeError: Headers.set: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJl
+       ZiI6Imdlamh6eGp0Z2p6bW9xbnFodGxqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDM3ODY5NSwiZXh
+       wIjoyMDk1OTU0Njk1fQ.FcgTasCVE5ZQ1wRowPXNeGyf5UxdQIyyvRXH5K8mC4o" is an invalid header value.
+      at webidl.errors.exception (node:internal/deps/undici/undici:1394:14)
+      at webidl.errors.invalidArgument (node:internal/deps/undici/undici:1405:28)
+      at Headers.set (node:internal/deps/undici/undici:1958:31)
+      at file:///app/backend/node_modules/@supabase/supabase-js/dist/index.mjs:332:39
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+}
+POST /api/files/upload 500 369.871 ms - 290
