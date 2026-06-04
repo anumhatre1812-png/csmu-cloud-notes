@@ -63,7 +63,7 @@ export const getPreviewBlobApi = async (id: string) => {
     headers,
     responseType: 'blob'
   });
-  return { blob: data, type: responseHeaders['content-type'] };
+  return { blob: data, type: (responseHeaders['content-type'] as string | undefined) };
 };
 
 export const fetchAdminStats = async () => {

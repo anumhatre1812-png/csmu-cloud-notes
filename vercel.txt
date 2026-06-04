@@ -1,0 +1,14 @@
+Running build in Washington, D.C., USA (East) – iad1
+Build machine configuration: 2 cores, 8 GB
+Cloning github.com/anumhatre1812-png/csmu-cloud-notes (Branch: main, Commit: 8434e26)
+Cloning completed: 706.000ms
+Restored build cache from previous deployment (CBMNqPhhNNrED8qPMnpchHBccVGJ)
+Running "vercel build"
+Vercel CLI 54.9.0
+Running "install" command: `npm install`...
+up to date, audited 655 packages in 1s
+154 packages are looking for funding
+  run `npm fund` for details
+found 0 vulnerabilities
+> frontend@1.0.0 build
+> tsc -b && vite build
