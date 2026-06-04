@@ -128,5 +128,11 @@ CREATE POLICY "Users can manage own tokens"
 -- ============================================================
 -- Enable Realtime
 -- ============================================================
-ALTER PUBLICATION supabase_realtime ADD TABLE files;
-ALTER PUBLICATION supabase_realtime ADD TABLE announcements;
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE files;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END; $$;
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE announcements;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END; $$;
