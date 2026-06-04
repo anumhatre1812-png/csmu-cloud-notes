@@ -17,7 +17,14 @@ const mobileOrigins = ['capacitor://localhost', 'https://localhost', 'http://loc
 const corsOrigins = [...new Set([...allowedOrigins, ...mobileOrigins])];
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      frameAncestors: ["'self'", ...allowedOrigins, 'capacitor://localhost'],
+    },
+  },
+}));
 app.use(cors({
   origin: allowedOrigins.includes('*')
     ? true
