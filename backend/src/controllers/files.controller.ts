@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/verifyFirebaseToken.js';
+import { adminAuth } from '../config/firebase.js';
 import { supabase } from '../config/supabase.js';
 import { logAdminAction } from '../services/auditLog.service.js';
 
@@ -55,6 +56,17 @@ export const createDownloadUrl = async (req: AuthRequest, res: Response) => {
 export const previewFile = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
+    let token = req.headers.authorization?.split('Bearer ')[1];
+    if (!token) token = req.query.token as string;
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+    try {
+      const decodedToken = await adminAuth.verifyIdToken(token);
+      req.user = decodedToken;
+    } catch {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
 
     const { data: fileData, error: fetchError } = await supabase
       .from('files')

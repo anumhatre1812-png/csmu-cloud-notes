@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, FileText, Calendar, User, Book, Eye, X, Heart, Share2, Wifi, Image, FileSpreadsheet, FilePenLine } from 'lucide-react';
+import { auth } from '../../config/firebase';
 import { getDownloadUrl, downloadFile, addBookmark, removeBookmark, fetchBookmarks, isLocallyBookmarked, toggleLocalBookmark, addRecentDownload, cacheFileForOffline, isFileCachedOffline, logDownload as logDownloadApi, getPreviewBlob } from '../../services/fileService';
 import { toast } from 'react-hot-toast';
 
@@ -159,19 +160,25 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
 
   const handlePreview = async () => {
     try {
-      const { blob, type } = await getPreviewBlob(file.id);
-      const url = URL.createObjectURL(blob);
-      setPreviewUrl(url);
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) { toast.error('Not authenticated'); return; }
+      const API_URL = import.meta.env.VITE_RAILWAY_API_URL;
+      const baseUrl = `${API_URL}/api/files/${file.id}/preview?token=${encodeURIComponent(token)}`;
 
-      if (isPdfType(type, file.file_name) || type === 'application/pdf') {
+      if (isPdfType(fileType, file.file_name)) {
         setPreviewType('pdf');
-      } else if (type && isImageType(type)) {
+        setPreviewUrl(baseUrl);
+      } else if (fileType && isImageType(fileType)) {
+        const { blob } = await getPreviewBlob(file.id);
+        setPreviewUrl(URL.createObjectURL(blob));
         setPreviewType('image');
         setImageLoaded(false);
-      } else if (isOfficeDoc(type)) {
+      } else if (isOfficeDoc(fileType)) {
         setPreviewType('office');
+        setPreviewUrl(baseUrl);
       } else {
         setPreviewType('pdf');
+        setPreviewUrl(baseUrl);
       }
       setShowPreview(true);
     } catch {

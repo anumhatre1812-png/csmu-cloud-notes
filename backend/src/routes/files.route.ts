@@ -7,7 +7,7 @@ const router = Router();
 
 router.get('/', verifyFirebaseToken, listFiles);
 router.get('/:id/download-url', verifyFirebaseToken, createDownloadUrl);
-router.get('/:id/preview', verifyFirebaseToken, previewFile);
+router.get('/:id/preview', previewFile);
 router.patch('/:id', verifyFirebaseToken, checkAdminRole, updateFileMetadata);
 
 export default router;
