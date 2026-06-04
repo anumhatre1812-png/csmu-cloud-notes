@@ -55,7 +55,7 @@ const Navbar: React.FC = () => {
               </div>
             )}
 
-            <Link to="/profile" className="hidden md:flex text-textSecondary hover:text-primary transition-colors items-center gap-1.5" title="Profile">
+            <Link to="/profile" className="hidden sm:flex text-textSecondary hover:text-primary transition-colors items-center gap-1.5" title="Profile">
               <User size={20} />
             </Link>
 
@@ -65,15 +65,13 @@ const Navbar: React.FC = () => {
                 <p className="text-xs text-textSecondary font-inter">{isAdmin ? 'Admin' : 'Student'}</p>
               </div>
 
-              {isAdmin && (
-                <button
-                  onClick={() => setMobileOpen(!mobileOpen)}
-                  className="md:hidden p-2 text-textSecondary hover:text-primary transition-colors"
-                  title="Menu"
-                >
-                  {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-                </button>
-              )}
+              <button
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className="sm:hidden p-2 text-textSecondary hover:text-primary transition-colors"
+                title="Menu"
+              >
+                {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
 
               <button
                 onClick={handleLogout}
@@ -87,10 +85,10 @@ const Navbar: React.FC = () => {
         </div>
       </nav>
 
-      {mobileOpen && isAdmin && (
-        <div className="fixed inset-x-0 top-[73px] z-40 bg-white/95 backdrop-blur-lg border-b border-primary/10 md:hidden">
+      {mobileOpen && (
+        <div className="fixed inset-x-0 top-[73px] z-40 bg-white/95 backdrop-blur-lg border-b border-primary/10 sm:hidden">
           <div className="flex flex-col p-4 gap-2">
-            {adminLinks.map(link => (
+            {isAdmin && adminLinks.map(link => (
               <Link
                 key={link.to}
                 to={link.to}
@@ -101,6 +99,14 @@ const Navbar: React.FC = () => {
                 <span className="font-medium">{link.label}</span>
               </Link>
             ))}
+            <Link
+              to="/profile"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-textSecondary hover:text-primary hover:bg-primary/5 transition-colors"
+            >
+              <User size={20} />
+              <span className="font-medium">Profile</span>
+            </Link>
           </div>
         </div>
       )}

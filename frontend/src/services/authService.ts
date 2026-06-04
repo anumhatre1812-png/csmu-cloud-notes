@@ -1,20 +1,25 @@
-import { GoogleAuthProvider, signInWithCredential, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut as firebaseSignOut } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithCredential, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut as firebaseSignOut } from 'firebase/auth';
 import { auth } from '../config/firebase';
-import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
+import { Capacitor } from '@capacitor/core';
 
 export const loginWithGoogle = async () => {
-  let result;
-  try {
-    result = await FirebaseAuthentication.signInWithGoogle();
-  } catch {
-    result = await FirebaseAuthentication.signInWithGoogle({ useCredentialManager: false });
+  if (Capacitor.isNativePlatform()) {
+    const { FirebaseAuthentication } = await import('@capacitor-firebase/authentication');
+    let result;
+    try {
+      result = await FirebaseAuthentication.signInWithGoogle();
+    } catch {
+      result = await FirebaseAuthentication.signInWithGoogle({ useCredentialManager: false });
+    }
+    const idToken = result.credential?.idToken;
+    if (idToken) {
+      const credential = GoogleAuthProvider.credential(idToken);
+      return signInWithCredential(auth, credential);
+    }
+    throw new Error('No ID token from native plugin');
   }
-  const idToken = result.credential?.idToken;
-  if (idToken) {
-    const credential = GoogleAuthProvider.credential(idToken);
-    return signInWithCredential(auth, credential);
-  }
-  throw new Error('No ID token from native plugin');
+  const provider = new GoogleAuthProvider();
+  return signInWithPopup(auth, provider);
 };
 
 export const loginWithEmail = async (email: string, password: string) => {
