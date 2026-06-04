@@ -160,13 +160,11 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
 
   const handlePreview = async () => {
     try {
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) { toast.error('Not authenticated'); return; }
-      const API_URL = import.meta.env.VITE_RAILWAY_API_URL;
-      const baseUrl = `${API_URL}/api/files/${file.id}/preview?token=${encodeURIComponent(token)}`;
-
       if (isPdfType(fileType, file.file_name)) {
-        window.open(baseUrl, '_blank');
+        const url = await getDownloadUrl(file.id);
+        const { blob, filename } = await downloadFile(url);
+        const blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, '_blank');
         return;
       }
       if (fileType && isImageType(fileType)) {
@@ -175,10 +173,13 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
         setPreviewType('image');
         setImageLoaded(false);
       } else if (isOfficeDoc(fileType)) {
+        const token = await auth.currentUser?.getIdToken();
+        if (!token) { toast.error('Not authenticated'); return; }
+        const API_URL = import.meta.env.VITE_RAILWAY_API_URL;
         setPreviewType('office');
-        setPreviewUrl(baseUrl);
+        setPreviewUrl(`${API_URL}/api/files/${file.id}/preview?token=${encodeURIComponent(token)}`);
       } else {
-        window.open(baseUrl, '_blank');
+        toast.error('Preview not available');
         return;
       }
       setShowPreview(true);
