@@ -80,7 +80,7 @@ export const previewFile = async (req: AuthRequest, res: Response) => {
 
     const { data, error } = await supabase.storage
       .from(fileData.category)
-      .createSignedUrl(fileData.storage_path, 3600);
+      .createSignedUrl(fileData.storage_path, 3600, { download: false });
 
     if (error || !data) throw error || new Error('No data');
 
