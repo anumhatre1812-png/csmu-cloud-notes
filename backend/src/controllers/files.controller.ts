@@ -3,6 +3,7 @@ import { AuthRequest } from '../middleware/verifyFirebaseToken.js';
 import { adminAuth } from '../config/firebase.js';
 import { supabase } from '../config/supabase.js';
 import { logAdminAction } from '../services/auditLog.service.js';
+import axios from 'axios';
 
 export const listFiles = async (_req: AuthRequest, res: Response) => {
   try {
@@ -50,6 +51,61 @@ export const createDownloadUrl = async (req: AuthRequest, res: Response) => {
   } catch (error: any) {
     console.error('Download URL error:', error);
     return res.status(500).json({ error: error.message || 'Internal server error' });
+  }
+};
+
+export const downloadFile = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    let token = req.headers.authorization?.split('Bearer ')[1];
+    if (!token || token === 'undefined' || token === 'null') {
+      token = req.query.token as string;
+    }
+    if (!token || token === 'undefined' || token === 'null') {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+    try {
+      const decodedToken = await adminAuth.verifyIdToken(token);
+      req.user = decodedToken;
+    } catch {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    const { data: fileData, error: fetchError } = await supabase
+      .from('files')
+      .select('category, storage_path, title, file_type, file_name, file_size')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !fileData) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+
+    const { data, error } = await supabase.storage
+      .from(fileData.category)
+      .createSignedUrl(fileData.storage_path, 60);
+
+    if (error || !data) throw error || new Error('No data');
+
+    const supabaseResponse = await axios.get(data.signedUrl, {
+      responseType: 'stream'
+    });
+
+    const fileName = fileData.file_name || `${fileData.title}.pdf`;
+    res.setHeader('Content-Type', fileData.file_type || 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
+    if (fileData.file_size) {
+      res.setHeader('Content-Length', String(fileData.file_size));
+    }
+
+    supabaseResponse.data.pipe(res);
+  } catch (error: any) {
+    console.error('Download error:', error);
+    if (!res.headersSent) {
+      return res.status(500).json({ error: error.message || 'Internal server error' });
+    }
+    res.end();
   }
 };
 

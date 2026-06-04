@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, FileText, Calendar, User, Book, Eye, X, Heart, Share2, Wifi, Image, FileSpreadsheet, FilePenLine } from 'lucide-react';
 import { auth } from '../../config/firebase';
-import { getDownloadUrl, downloadFile, addBookmark, removeBookmark, fetchBookmarks, isLocallyBookmarked, toggleLocalBookmark, addRecentDownload, cacheFileForOffline, isFileCachedOffline, logDownload as logDownloadApi, getPreviewBlob } from '../../services/fileService';
+import { addBookmark, removeBookmark, fetchBookmarks, isLocallyBookmarked, toggleLocalBookmark, addRecentDownload, isFileCachedOffline, logDownload as logDownloadApi, getPreviewBlob } from '../../services/fileService';
 import { toast } from 'react-hot-toast';
 
 interface FileCardProps {
@@ -41,7 +41,6 @@ const getPreviewButtonLabel = (mimeType?: string) => {
 
 const FileCard: React.FC<FileCardProps> = ({ file }) => {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [downloadProgress, setDownloadProgress] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
   const [previewType, setPreviewType] = useState<'pdf' | 'image' | 'office' | null>(null);
@@ -127,34 +126,33 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
 
   const handleDownload = async () => {
     setIsDownloading(true);
-    setDownloadProgress(0);
     try {
-      const url = await getDownloadUrl(file.id);
-      const { blob, filename } = await downloadFile(url, setDownloadProgress);
-      const blobUrl = URL.createObjectURL(blob);
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) {
+        toast.error('Not authenticated');
+        setIsDownloading(false);
+        return;
+      }
+      const API_URL = import.meta.env.VITE_RAILWAY_API_URL;
+      const downloadUrl = `${API_URL}/api/files/${file.id}/download?token=${encodeURIComponent(token)}`;
       const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = filename || file.title;
+      link.href = downloadUrl;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      URL.revokeObjectURL(blobUrl);
       addRecentDownload(file);
-      recordDownload(file.id, blob);
-      toast.success('Download complete!');
+      recordDownload(file.id);
+      toast.success('Download started!');
     } catch (error) {
       toast.error('Download failed');
     } finally {
       setIsDownloading(false);
-      setDownloadProgress(0);
     }
   };
 
-  const recordDownload = async (fileId: string, blob: Blob) => {
+  const recordDownload = async (fileId: string) => {
     try {
       await logDownloadApi({ file_id: fileId, file_title: file.title, file_category: file.category, file_size: file.file_size });
-      cacheFileForOffline(fileId, blob);
-      setCachedOffline(true);
     } catch {}
   };
 
@@ -289,7 +287,7 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
             className={`btn-primary flex items-center justify-center gap-2 py-3 disabled:opacity-50 ${canPreview ? 'flex-1' : 'w-full'}`}
           >
             {isDownloading ? (
-              <span className="text-sm">{downloadProgress}%</span>
+              <span className="text-sm">Downloading</span>
             ) : (
               <>
                 <Download size={16} />
@@ -299,13 +297,13 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
           </button>
         </div>
 
-        {isDownloading && downloadProgress > 0 && (
+        {isDownloading && (
           <div className="h-2 rounded-full bg-primary/10 overflow-hidden">
             <motion.div
               className="h-full rounded-full bg-gradient-to-r from-primary to-secondary"
-              initial={{ width: 0 }}
-              animate={{ width: `${downloadProgress}%` }}
-              transition={{ duration: 0.2 }}
+              initial={{ width: '0%' }}
+              animate={{ width: '60%' }}
+              transition={{ duration: 0.5, repeat: Infinity, repeatType: 'reverse' }}
             />
           </div>
         )}
