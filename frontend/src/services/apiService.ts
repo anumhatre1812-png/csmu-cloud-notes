@@ -57,6 +57,15 @@ export const downloadFileApi = async (url: string, onProgress?: (pct: number) =>
   return { blob: data, filename };
 };
 
+export const getPreviewBlobApi = async (id: string) => {
+  const headers = await getAuthHeaders();
+  const { data, headers: responseHeaders } = await axios.get(`${API_URL}/api/files/${id}/preview`, {
+    headers,
+    responseType: 'blob'
+  });
+  return { blob: data, type: responseHeaders['content-type'] };
+};
+
 export const fetchAdminStats = async () => {
   const headers = await getAuthHeaders();
   const { data } = await axios.get(`${API_URL}/api/admin/stats`, { headers });

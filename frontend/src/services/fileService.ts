@@ -1,4 +1,4 @@
-import { fetchFilesApi, getDownloadUrlApi, downloadFileApi, addBookmarkApi, removeBookmarkApi, fetchBookmarksApi, logDownloadApi, fetchDownloadHistoryApi } from './apiService';
+import { fetchFilesApi, getDownloadUrlApi, downloadFileApi, addBookmarkApi, removeBookmarkApi, fetchBookmarksApi, logDownloadApi, fetchDownloadHistoryApi, getPreviewBlobApi } from './apiService';
 
 const CACHE_NAME = 'csmu-notes-offline';
 
@@ -8,6 +8,10 @@ export const fetchFiles = async () => {
 
 export const getDownloadUrl = async (id: string) => {
   return getDownloadUrlApi(id);
+};
+
+export const getPreviewBlob = async (id: string) => {
+  return getPreviewBlobApi(id);
 };
 
 export const downloadFile = async (url: string, onProgress?: (pct: number) => void) => {

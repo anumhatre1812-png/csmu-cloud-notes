@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, FileText, Calendar, User, Book, Eye, X, Heart, Share2, Wifi, Image, FileSpreadsheet, FilePenLine } from 'lucide-react';
-import { getDownloadUrl, downloadFile, addBookmark, removeBookmark, fetchBookmarks, isLocallyBookmarked, toggleLocalBookmark, addRecentDownload, cacheFileForOffline, isFileCachedOffline, logDownload as logDownloadApi } from '../../services/fileService';
+import { getDownloadUrl, downloadFile, addBookmark, removeBookmark, fetchBookmarks, isLocallyBookmarked, toggleLocalBookmark, addRecentDownload, cacheFileForOffline, isFileCachedOffline, logDownload as logDownloadApi, getPreviewBlob } from '../../services/fileService';
 import { toast } from 'react-hot-toast';
 
 interface FileCardProps {
@@ -159,15 +159,16 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
 
   const handlePreview = async () => {
     try {
-      const url = file.file_url || await getDownloadUrl(file.id);
+      const { blob, type } = await getPreviewBlob(file.id);
+      const url = URL.createObjectURL(blob);
       setPreviewUrl(url);
 
-      if (isPdfType(fileType, file.file_name)) {
+      if (isPdfType(type, file.file_name) || type === 'application/pdf') {
         setPreviewType('pdf');
-      } else if (fileType && isImageType(fileType)) {
+      } else if (type && isImageType(type)) {
         setPreviewType('image');
         setImageLoaded(false);
-      } else if (fileType && isOfficeDoc(fileType)) {
+      } else if (isOfficeDoc(type)) {
         setPreviewType('office');
       } else {
         setPreviewType('pdf');

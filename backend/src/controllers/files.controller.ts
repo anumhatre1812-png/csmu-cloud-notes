@@ -52,6 +52,41 @@ export const createDownloadUrl = async (req: AuthRequest, res: Response) => {
   }
 };
 
+export const previewFile = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const { data: fileData, error: fetchError } = await supabase
+      .from('files')
+      .select('category, storage_path, file_type')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !fileData) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+
+    const { data, error } = await supabase.storage
+      .from(fileData.category)
+      .download(fileData.storage_path);
+
+    if (error || !data) throw error || new Error('No data');
+
+    const buffer = Buffer.from(await data.arrayBuffer());
+
+    res.set({
+      'Content-Type': fileData.file_type || 'application/octet-stream',
+      'Content-Disposition': 'inline',
+      'Content-Length': buffer.length.toString()
+    });
+
+    return res.send(buffer);
+  } catch (error: any) {
+    console.error('Preview error:', error);
+    return res.status(500).json({ error: error.message || 'Internal server error' });
+  }
+};
+
 export const updateFileMetadata = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
