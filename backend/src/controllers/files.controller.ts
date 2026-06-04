@@ -57,8 +57,10 @@ export const previewFile = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     let token = req.headers.authorization?.split('Bearer ')[1];
-    if (!token) token = req.query.token as string;
-    if (!token) {
+    if (!token || token === 'undefined' || token === 'null') {
+      token = req.query.token as string;
+    }
+    if (!token || token === 'undefined' || token === 'null') {
       return res.status(401).json({ error: 'No token provided' });
     }
     try {

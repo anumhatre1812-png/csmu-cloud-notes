@@ -5,7 +5,7 @@ const API_URL = import.meta.env.VITE_RAILWAY_API_URL;
 
 const getAuthHeaders = async () => {
   const token = await auth.currentUser?.getIdToken();
-  return { Authorization: `Bearer ${token}` };
+  return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 export const uploadFileApi = async (formData: FormData, onProgress?: (progress: number) => void) => {

@@ -8,7 +8,7 @@ export interface AuthRequest extends Request {
 export const verifyFirebaseToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
   const token = req.headers.authorization?.split('Bearer ')[1];
 
-  if (!token) {
+  if (!token || token === 'undefined' || token === 'null') {
     return res.status(401).json({ error: 'No token provided' });
   }
 

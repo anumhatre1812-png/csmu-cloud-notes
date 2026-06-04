@@ -161,11 +161,10 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
   const handlePreview = async () => {
     try {
       if (isPdfType(fileType, file.file_name)) {
-        const token = await auth.currentUser?.getIdToken();
-        if (!token) { toast.error('Not authenticated'); return; }
-        const API_URL = import.meta.env.VITE_RAILWAY_API_URL;
+        const { blob } = await getPreviewBlob(file.id);
+        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+        setPreviewUrl(URL.createObjectURL(pdfBlob));
         setPreviewType('pdf');
-        setPreviewUrl(`${API_URL}/api/files/${file.id}/preview?token=${encodeURIComponent(token)}`);
       } else if (fileType && isImageType(fileType)) {
         const { blob } = await getPreviewBlob(file.id);
         setPreviewUrl(URL.createObjectURL(blob));
