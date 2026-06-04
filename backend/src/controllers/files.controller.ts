@@ -80,19 +80,11 @@ export const previewFile = async (req: AuthRequest, res: Response) => {
 
     const { data, error } = await supabase.storage
       .from(fileData.category)
-      .download(fileData.storage_path);
+      .createSignedUrl(fileData.storage_path, 3600);
 
     if (error || !data) throw error || new Error('No data');
 
-    const buffer = Buffer.from(await data.arrayBuffer());
-
-    res.set({
-      'Content-Type': fileData.file_type || 'application/octet-stream',
-      'Content-Disposition': 'inline',
-      'Content-Length': buffer.length.toString()
-    });
-
-    return res.send(buffer);
+    return res.redirect(data.signedUrl);
   } catch (error: any) {
     console.error('Preview error:', error);
     return res.status(500).json({ error: error.message || 'Internal server error' });
