@@ -32,15 +32,23 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const urlToOpen = new URL('/', self.location.origin).href;
+  const payload = event.notification.data || {};
+  let url = '/';
+
+  if (payload.type === 'new_file' && payload.fileId) {
+    url = '/student/dashboard';
+  } else if (payload.type === 'announcement') {
+    url = '/student/dashboard';
+  }
+
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
       for (const client of windowClients) {
-        if (client.url === urlToOpen) {
+        if (client.url.includes(url)) {
           return client.focus();
         }
       }
-      return clients.openWindow(urlToOpen);
+      return clients.openWindow(url);
     })
   );
 });
