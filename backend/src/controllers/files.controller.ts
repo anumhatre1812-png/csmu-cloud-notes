@@ -142,10 +142,18 @@ export const previewFile = async (req: AuthRequest, res: Response) => {
 
     if (error || !data) throw error || new Error('No data');
 
-    return res.redirect(data.signedUrl);
+    const supabaseResponse = await axios.get(data.signedUrl, {
+      responseType: 'stream'
+    });
+
+    res.setHeader('Content-Type', fileData.file_type || 'application/octet-stream');
+    supabaseResponse.data.pipe(res);
   } catch (error: any) {
     console.error('Preview error:', error);
-    return res.status(500).json({ error: error.message || 'Internal server error' });
+    if (!res.headersSent) {
+      return res.status(500).json({ error: error.message || 'Internal server error' });
+    }
+    res.end();
   }
 };
 
