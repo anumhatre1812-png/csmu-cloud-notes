@@ -166,9 +166,10 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
       const baseUrl = `${API_URL}/api/files/${file.id}/preview?token=${encodeURIComponent(token)}`;
 
       if (isPdfType(fileType, file.file_name)) {
-        setPreviewType('pdf');
-        setPreviewUrl(baseUrl);
-      } else if (fileType && isImageType(fileType)) {
+        window.open(baseUrl, '_blank');
+        return;
+      }
+      if (fileType && isImageType(fileType)) {
         const { blob } = await getPreviewBlob(file.id);
         setPreviewUrl(URL.createObjectURL(blob));
         setPreviewType('image');
@@ -177,8 +178,8 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
         setPreviewType('office');
         setPreviewUrl(baseUrl);
       } else {
-        setPreviewType('pdf');
-        setPreviewUrl(baseUrl);
+        window.open(baseUrl, '_blank');
+        return;
       }
       setShowPreview(true);
     } catch {
