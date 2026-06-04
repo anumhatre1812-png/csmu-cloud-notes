@@ -51,7 +51,7 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
 
   const fileType = file.file_type;
 
-  const canPreview = false;
+  const canPreview = isPdfType(fileType, file.file_name) || isImageType(fileType) || isOfficeDoc(fileType);
 
   useEffect(() => {
     checkBookmarkStatus();
